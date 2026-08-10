@@ -1,0 +1,15 @@
+{
+ "arm": "C",
+ "lambda_loc": 0.0,
+ "mu_dom": 0.1,
+ "alpha_balance": 0.01,
+ "tokens": 200000000.0,
+ "bsz": 8,
+ "seq": 1024,
+ "lr": 0.0006,
+ "seed": 1,
+ "data_dir": "data",
+ "run_name": "c-main-s1",
+ "eval_only": false,
+ "params": 137319168
+}

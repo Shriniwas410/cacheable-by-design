@@ -1,0 +1,15 @@
+# large / regenerable artifacts — never commit
+*.pt
+*.gguf
+*.bin
+*.safetensors
+data/
+**/corpus.txt
+__pycache__/
+.pytest_cache/
+paper/build/
+*.aux
+*.log
+*.out
+*.xdv
+.DS_Store
