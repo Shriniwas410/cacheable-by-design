@@ -21,7 +21,7 @@ import argparse, json, math, os
 import numpy as np, torch
 import torch.nn.functional as F
 from model import Config, StickyMoE, rope_cache
-from cacheeval import reroute_token
+from cacheeval import reroute_token, cfg_for_ckpt
 
 DOMAINS = ["prose", "code", "math"]
 
@@ -99,7 +99,7 @@ def main():
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
     torch.set_num_threads(os.cpu_count()); device = "cpu"
-    cfg = Config(); model = StickyMoE(cfg).to(device)
+    cfg = cfg_for_ckpt(args.ckpt); model = StickyMoE(cfg).to(device)
     model.load_state_dict(torch.load(args.ckpt, map_location=device)); model.eval()
     cap = max(1, int(round(args.cap * cfg.n_experts)))
 

@@ -93,6 +93,21 @@ def eval_domain(model, tokens, tau, cap, seq, k, E, L, device):
     return sum_ce, n_pos, misses
 
 
+def cfg_for_ckpt(ckpt):
+    """Build the Config matching a checkpoint from its run's config.json (falls back to
+    137M defaults for older runs that omit dims). n_heads follows train.py: d_model//64.
+    Lets cacheeval run on the 340M+ scale checkpoints, not just the 137M default."""
+    cfg = Config()
+    cj_path = os.path.join(os.path.dirname(ckpt), "config.json")
+    if os.path.exists(cj_path):
+        cj = json.load(open(cj_path))
+        for f in ("vocab_size", "d_model", "n_layers", "n_experts", "top_k", "d_expert", "max_seq"):
+            if f in cj:
+                setattr(cfg, f, cj[f])
+        cfg.n_heads = cj.get("n_heads", max(1, cfg.d_model // 64))
+    return cfg
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ckpt", required=True)
@@ -107,7 +122,7 @@ def main():
     torch.set_num_threads(os.cpu_count())
     device = "cpu"
 
-    cfg = Config()                                        # 137M default
+    cfg = cfg_for_ckpt(args.ckpt)                         # size from run config.json (137M or 340M+)
     model = StickyMoE(cfg).to(device)
     sd = torch.load(args.ckpt, map_location=device)
     model.load_state_dict(sd); model.eval()
