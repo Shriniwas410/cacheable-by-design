@@ -3,12 +3,16 @@
 % on memory-constrained edge hardware (bandwidth wall, router telemetry, path-mapped
 % serving, and a locality/domain auxiliary-loss router negative result).
 %
-% VERIFICATION PROTOCOL: every entry below was opened and read beyond the abstract
-% (intro + method/results) via Claude-in-Chrome on the arXiv HTML/ar5iv full text, or
-% (where noted) via a WebFetch of the same full text. Each entry carries:
-%   % verified_finding: a specific non-abstract claim/number read in the body text
-%   % source: chrome|webfetch, pdf/html-read
-% Identifiers (title, authors, year, arXiv id) were taken from the arXiv abstract page.
+% VERIFICATION PROTOCOL (v2, PDF-grounded): the source of truth is the local PDF
+% corpus in paper/refpdfs/ (one <arxiv_id>.pdf per entry, sha256 in refpdfs/manifest.json,
+% full text extracted to refpdfs/txt/). No claim is written from an abstract or HTML page.
+% Re-verify at any time with:  python verify_refs.py   (deterministic: local PDF exists +
+% sha256 matches, no placeholder authors, every number in verified_finding present in the
+% PDF text, title matches page 1, source names a local pdf). Each entry carries:
+%   % verified_finding: a specific claim/number read in the PDF body text
+%   % source: local pdf refpdfs/<id>.pdf sha256:<12>; <original remote read, for audit>
+% The three load-bearing concurrent-work entries (kayyam2026sticky, eldr2026, cachecond2024)
+% were additionally re-downloaded from arXiv and sha-compared to the local copies (MATCH).
 
 % ===================================================================
 % MoE FOUNDATIONS
@@ -17,13 +21,14 @@
 % verified_finding: Table 4/results -- GLaM (64B/64E) activates only ~96.6B params per
 %   token (8% of 1.2T total) at inference, needing about HALF the compute FLOPs of GPT-3
 %   while training on 1,024 TPU-v4 chips consumed ~1/3 of GPT-3's training energy.
-% source: chrome, html-read (ar5iv.labs.arxiv.org/html/2112.06905)
+% source: local pdf refpdfs/2112.06905.pdf sha256:7b52d17e09bb; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/2112.06905)
 @inproceedings{du2022glam,
   title     = {{GLaM}: Efficient Scaling of Language Models with Mixture-of-Experts},
   author    = {Du, Nan and Huang, Yanping and Dai, Andrew M. and Tong, Simon and Lepikhin, Dmitry and Xu, Yuanzhong and Krikun, Maxim and Zhou, Yanqi and Yu, Adams Wei and Firat, Orhan and Zoph, Barret and Fedus, Liam and Bosma, Maarten and Zhou, Zongwei and Wang, Tao and Wang, Yu Emma and Webster, Kellie and Pellat, Marie and Robinson, Kevin and Meier-Hellstern, Kathleen and Duke, Toju and Dixon, Lucas and Zhang, Kun and Le, Quoc V. and Wu, Yonghui and Chen, Zhifeng and Cui, Claire},
   booktitle = {Proceedings of the 39th International Conference on Machine Learning (ICML)},
   year      = {2022},
   eprint    = {2112.06905},
+  url       = {https://arxiv.org/abs/2112.06905},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -32,13 +37,14 @@
 %   training stability with no quality degradation" by penalising large router logits (cutting
 %   roundoff error); Sec.7 shows encoder experts specialize by token type but multilingual
 %   experts "specialize, but not by language".
-% source: chrome, html-read (ar5iv.labs.arxiv.org/html/2202.08906)
+% source: local pdf refpdfs/2202.08906.pdf sha256:185327b54b6b; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/2202.08906)
 @article{zoph2022stmoe,
   title   = {{ST-MoE}: Designing Stable and Transferable Sparse Expert Models},
   author  = {Zoph, Barret and Bello, Irwan and Kumar, Sameer and Du, Nan and Huang, Yanping and Dean, Jeff and Shazeer, Noam and Fedus, William},
   journal = {arXiv preprint arXiv:2202.08906},
   year    = {2022},
   eprint  = {2202.08906},
+  url       = {https://arxiv.org/abs/2202.08906},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -46,13 +52,14 @@
 % verified_finding: Sec.4.5 -- expert-choice routing gives PERFECT load balance by design;
 %   Fig.3 statistics show most tokens go to 1-2 experts, ~23% to 3-4 experts, only ~3% to
 %   >4 experts; EC-CF2 converges >2x faster than GShard top-2 (same perplexity in <half steps).
-% source: chrome, html-read (ar5iv.labs.arxiv.org/html/2202.09368)
+% source: local pdf refpdfs/2202.09368.pdf sha256:69c430b35868; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/2202.09368)
 @article{zhou2022expertchoice,
   title   = {Mixture-of-Experts with Expert Choice Routing},
   author  = {Zhou, Yanqi and Lei, Tao and Liu, Hanxiao and Du, Nan and Huang, Yanping and Zhao, Vincent and Dai, Andrew and Chen, Zhifeng and Le, Quoc and Laudon, James},
   journal = {arXiv preprint arXiv:2202.09368},
   year    = {2022},
   eprint  = {2202.09368},
+  url       = {https://arxiv.org/abs/2202.09368},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -60,13 +67,14 @@
 % verified_finding: Results sec. -- the largest model (4096 experts, hierarchical MoE,
 %   ~137B params in the MoE layer) achieved 24% lower test perplexity than the
 %   computationally-matched LSTM baseline on the 1B Word Benchmark.
-% source: chrome, html-read (ar5iv.labs.arxiv.org/html/1701.06538)
+% source: local pdf refpdfs/1701.06538.pdf sha256:2567713d198a; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/1701.06538)
 @article{shazeer2017moe,
   title   = {Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer},
   author  = {Shazeer, Noam and Mirhoseini, Azalia and Maziarz, Krzysztof and Davis, Andy and Le, Quoc and Hinton, Geoffrey and Dean, Jeff},
   journal = {arXiv preprint arXiv:1701.06538},
   year    = {2017},
   eprint  = {1701.06538},
+  url       = {https://arxiv.org/abs/1701.06538},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -74,7 +82,7 @@
 % verified_finding: Method -- introduces selective-precision (bfloat16) training, an
 %   initialization scheme, and expert dropout; uses a capacity factor > 1.0 so each
 %   expert buffers extra tokens; reports 7x+ pre-training speedups at equal FLOPs/token.
-% source: chrome, html-read (ar5iv.labs.arxiv.org/html/2101.03961)
+% source: local pdf refpdfs/2101.03961.pdf sha256:f340f6ace31a; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/2101.03961)
 @article{fedus2022switch,
   title   = {Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity},
   author  = {Fedus, William and Zoph, Barret and Shazeer, Noam},
@@ -84,6 +92,7 @@
   pages   = {1--39},
   year    = {2022},
   eprint  = {2101.03961},
+  url       = {https://arxiv.org/abs/2101.03961},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -91,13 +100,14 @@
 % verified_finding: Fig. 1 -- the 600B MoE was trained on 2048 TPU v3 cores in 4 days
 %   (22 TPU v3 core-years), whereas training all 100 bilingual baselines would need
 %   29 core-years; scaling 37.5B->600B (16x params) raised compute cost only 3.6x.
-% source: chrome, html-read (ar5iv.labs.arxiv.org/html/2006.16668)
+% source: local pdf refpdfs/2006.16668.pdf sha256:4078d81e9ef6; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/2006.16668)
 @article{lepikhin2021gshard,
   title   = {GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding},
   author  = {Lepikhin, Dmitry and Lee, HyoukJoong and Xu, Yuanzhong and Chen, Dehao and Firat, Orhan and Huang, Yanping and Krikun, Maxim and Shazeer, Noam and Chen, Zhifeng},
   journal = {arXiv preprint arXiv:2006.16668},
   year    = {2020},
   eprint  = {2006.16668},
+  url       = {https://arxiv.org/abs/2006.16668},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -105,13 +115,14 @@
 % verified_finding: Results table -- on 100B training tokens DeepSeekMoE 2B reaches the
 %   lowest Pile validation loss (1.808) vs Dense, Hash Layers, Switch and GShard
 %   (2.060 -> 1.808), nearly matching its same-param dense upper bound.
-% source: chrome, html-read (arxiv.org/html/2401.06066v1)
+% source: local pdf refpdfs/2401.06066.pdf sha256:a64b509e1410; orig: chrome, html-read (arxiv.org/html/2401.06066v1)
 @article{dai2024deepseekmoe,
   title   = {DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models},
   author  = {Dai, Damai and Deng, Chengqi and Zhao, Chenggang and Xu, R. X. and Gao, Huazuo and Chen, Deli and Li, Jiashi and Zeng, Wangding and Yu, Xingkai and Wu, Y. and Xie, Zhenda and Li, Y. K. and Huang, Panpan and Luo, Fuli and Ruan, Chong and Sui, Zhifang and Liang, Wenfeng},
   journal = {arXiv preprint arXiv:2401.06066},
   year    = {2024},
   eprint  = {2401.06066},
+  url       = {https://arxiv.org/abs/2401.06066},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -119,13 +130,14 @@
 % verified_finding: Sec. 5 "Routing analysis" -- expert selection shows high TEMPORAL
 %   locality: Table 5 reports consecutive-token repeated expert assignment up to ~67%
 %   (layer 15) vs ~46% random; paper notes "this locality can be leveraged for caching".
-% source: chrome, html-read (ar5iv.labs.arxiv.org/html/2401.04088)
+% source: local pdf refpdfs/2401.04088.pdf sha256:f8bbf0e9d979; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/2401.04088)
 @article{jiang2024mixtral,
   title   = {Mixtral of Experts},
   author  = {Jiang, Albert Q. and Sablayrolles, Alexandre and Roux, Antoine and Mensch, Arthur and Savary, Blanche and Bamford, Chris and Chaplot, Devendra Singh and de las Casas, Diego and Bou Hanna, Emma and Bressand, Florian and Lengyel, Gianna and Bour, Guillaume and Lample, Guillaume and Lavaud, L{\'e}lio Renard and Saulnier, Lucile and Lachaux, Marie-Anne and Stock, Pierre and Subramanian, Sandeep and Yang, Sophia and Antoniak, Szymon and Le Scao, Teven and Gervet, Th{\'e}ophile and Lavril, Thibaut and Wang, Thomas and Lacroix, Timoth{\'e}e and El Sayed, William},
   journal = {arXiv preprint arXiv:2401.04088},
   year    = {2024},
   eprint  = {2401.04088},
+  url       = {https://arxiv.org/abs/2401.04088},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -137,13 +149,14 @@
 % verified_finding: Sec.1 -- exploits power-law neuron activation: preselects "hot" neurons
 %   (high activation frequency) on GPU and "cold" ones on CPU; delivers up to 11.69x speedup
 %   over llama.cpp on a single RTX 4090 while retaining accuracy (incl. OPT-175B).
-% source: chrome/curl, html-read (arxiv.org/html/2312.12456)
+% source: local pdf refpdfs/2312.12456.pdf sha256:a527a2a55cf5; orig: chrome/curl, html-read (arxiv.org/html/2312.12456)
 @inproceedings{song2024powerinfer,
   title     = {PowerInfer: Fast Large Language Model Serving with a Consumer-grade GPU},
   author    = {Song, Yixin and Mi, Zeyu and Xie, Haotong and Chen, Haibo},
   booktitle = {Proceedings of the ACM SIGOPS 30th Symposium on Operating Systems Principles (SOSP)},
   year      = {2024},
   eprint    = {2312.12456},
+  url       = {https://arxiv.org/abs/2312.12456},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -151,27 +164,29 @@
 % verified_finding: Results -- "the first system to serve a 47B LLM on a smartphone,
 %   achieving 11.68 tokens/s"; uses neuron-cluster-level pipelining and I/O overlap to beat
 %   the phone's memory-bandwidth wall.
-% source: chrome/curl, html-read (arxiv.org/html/2406.06282)
+% source: local pdf refpdfs/2406.06282.pdf sha256:1f1b42628481; orig: chrome/curl, html-read (arxiv.org/html/2406.06282)
 @article{xue2024powerinfer2,
   title   = {PowerInfer-2: Fast Large Language Model Inference on a Smartphone},
   author  = {Xue, Zhenliang and Song, Yixin and Mi, Zeyu and Zheng, Xinrui and Xia, Yubin and Chen, Haibo},
   journal = {arXiv preprint arXiv:2406.06282},
   year    = {2024},
   eprint  = {2406.06282},
+  url       = {https://arxiv.org/abs/2406.06282},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
 
 % verified_finding: Method -- expert-wise bitwidth adaptation plus an in-memory expert
-%   buffer that holds only hot experts; reports up to 2.78x inference speedup with acceptable
-%   accuracy loss on edge devices (experts are the dominant memory/IO cost).
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2308.14352)
+%   buffer that holds only hot experts; reports up to 2.77x inference speedup over STI (and
+%   1.19x-2.77x over baselines) with acceptable accuracy loss on edge devices.
+% source: local pdf refpdfs/2308.14352.pdf sha256:4e4b5cd9c73a; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2308.14352)
 @article{yi2023edgemoe,
   title   = {EdgeMoE: Empowering Sparse Large Language Models on Mobile Devices},
   author  = {Yi, Rongjie and Guo, Liwei and Wei, Shiyun and Zhou, Ao and Wang, Shangguang and Xu, Mengwei},
   journal = {arXiv preprint arXiv:2308.14352},
   year    = {2023},
   eprint  = {2308.14352},
+  url       = {https://arxiv.org/abs/2308.14352},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -179,13 +194,14 @@
 % verified_finding: Results -- expert-activation traces (EAM) guide cache replacement and
 %   prefetching, giving 1--16.7x latency reduction vs offloading baselines on a commodity GPU
 %   (traces are collected at the EXPERT level, unlike generic memory tracers).
-% source: chrome/curl, html-read (arxiv.org/html/2401.14361)
+% source: local pdf refpdfs/2401.14361.pdf sha256:2172d3905069; orig: chrome/curl, html-read (arxiv.org/html/2401.14361)
 @article{xue2024moeinfinity,
   title   = {MoE-Infinity: Efficient MoE Inference on Personal Machines with Sparsity-Aware Expert Cache},
   author  = {Xue, Leyang and Fu, Yao and Lu, Zhan and Mai, Luo and Marina, Mahesh},
   journal = {arXiv preprint arXiv:2401.14361},
   year    = {2024},
   eprint  = {2401.14361},
+  url       = {https://arxiv.org/abs/2401.14361},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -193,13 +209,14 @@
 % verified_finding: Method/Sec.3 -- runs uncompressed 16-bit Mixtral-8x7B (>90GB) on a single
 %   GPU by executing CPU-resident experts on the CPU; copying activations GPU->CPU is
 %   negligible (<1% of total latency) since activations are far smaller than expert weights.
-% source: chrome/curl, html-read (arxiv.org/html/2402.07033)
+% source: local pdf refpdfs/2402.07033.pdf sha256:40c1502e197c; orig: chrome/curl, html-read (arxiv.org/html/2402.07033)
 @inproceedings{kamahori2025fiddler,
   title     = {Fiddler: CPU-GPU Orchestration for Fast Inference of Mixture-of-Experts Models},
   author    = {Kamahori, Keisuke and Tang, Tian and Gu, Yile and Zhu, Kan and Kasikci, Baris},
   booktitle = {International Conference on Learning Representations (ICLR)},
   year      = {2025},
   eprint    = {2402.07033},
+  url       = {https://arxiv.org/abs/2402.07033},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -207,13 +224,14 @@
 % verified_finding: Method -- the N-th block's "pre-gate" predicts the experts needed by the
 %   (N+1)-th block, prefetching only those experts; adds just 23% latency overhead vs an
 %   oracle GPU-only solution while cutting peak GPU memory.
-% source: chrome/curl, html-read (arxiv.org/html/2308.12066)
+% source: local pdf refpdfs/2308.12066.pdf sha256:d7d307b91d79; orig: chrome/curl, html-read (arxiv.org/html/2308.12066)
 @article{hwang2023pregated,
   title   = {Pre-gated MoE: An Algorithm-System Co-Design for Fast and Scalable Mixture-of-Expert Inference},
   author  = {Hwang, Ranggi and Wei, Jianyu and Cao, Shijie and Hwang, Changho and Tang, Xiaohu and Cao, Ting and Yang, Mao},
   journal = {arXiv preprint arXiv:2308.12066},
   year    = {2023},
   eprint  = {2308.12066},
+  url       = {https://arxiv.org/abs/2308.12066},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -221,13 +239,14 @@
 % verified_finding: Results -- a distilled hash-based predictor forecasts which experts each
 %   token needs; SiDA-MoE gets up to 3.93x throughput, up to 72% latency reduction and up to
 %   80% GPU-memory saving with down to 1% performance drop.
-% source: chrome/curl, html-read (arxiv.org/html/2310.18859)
+% source: local pdf refpdfs/2310.18859.pdf sha256:f0d88f8a494c; orig: chrome/curl, html-read (arxiv.org/html/2310.18859)
 @inproceedings{du2024sidamoe,
   title     = {SiDA-MoE: Sparsity-Inspired Data-Aware Serving for Efficient and Scalable Large Mixture-of-Experts Models},
   author    = {Du, Zhixu and Li, Shiyu and Wu, Yuhao and Jiang, Xiangyu and Sun, Jingwei and Zheng, Qilin and Wu, Yongkai and Li, Ang and Li, Hai and Chen, Yiran},
   booktitle = {Proceedings of Machine Learning and Systems (MLSys)},
   year      = {2024},
   eprint    = {2310.18859},
+  url       = {https://arxiv.org/abs/2310.18859},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -235,13 +254,14 @@
 % verified_finding: Method -- a MoE-specific offloading strategy using an LRU expert cache
 %   plus speculative (ahead-of-time) expert prefetching runs Mixtral-8x7B-Instruct with mixed
 %   quantization interactively at 2-3 tokens/s on a T4 / RTX 3060 / RTX 3080 Mobile.
-% source: chrome/curl, html-read (arxiv.org/html/2312.17238)
+% source: local pdf refpdfs/2312.17238.pdf sha256:4c2543bb6b5a; orig: chrome/curl, html-read (arxiv.org/html/2312.17238)
 @article{eliseev2023mixtraloffload,
   title   = {Fast Inference of Mixture-of-Experts Language Models with Offloading},
   author  = {Eliseev, Artyom and Mazur, Denis},
   journal = {arXiv preprint arXiv:2312.17238},
   year    = {2023},
   eprint  = {2312.17238},
+  url       = {https://arxiv.org/abs/2312.17238},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -253,13 +273,14 @@
 % verified_finding: Abstract/Intro -- 671B total params with only 37B activated per token;
 %   "pioneers an auxiliary-loss-free strategy for load balancing" and multi-token prediction;
 %   full training took only 2.788M H800 GPU-hours on 14.8T tokens.
-% source: chrome/curl, html-read (arxiv.org/html/2412.19437)
+% source: local pdf refpdfs/2412.19437.pdf sha256:812a3fd645c8; orig: chrome/curl, html-read (arxiv.org/html/2412.19437)
 @article{deepseekai2024deepseekv3,
   title   = {DeepSeek-V3 Technical Report},
   author  = {{DeepSeek-AI}},
   journal = {arXiv preprint arXiv:2412.19437},
   year    = {2024},
   eprint  = {2412.19437},
+  url       = {https://arxiv.org/abs/2412.19437},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -267,13 +288,14 @@
 % verified_finding: Intro -- flagship Qwen3-235B-A22B is an MoE with 235B total / 22B
 %   activated params per token; introduces a "thinking budget" letting users allocate
 %   inference compute adaptively to trade latency against reasoning quality.
-% source: chrome/curl, html-read (arxiv.org/html/2505.09388)
+% source: local pdf refpdfs/2505.09388.pdf sha256:84a5e2b1fa04; orig: chrome/curl, html-read (arxiv.org/html/2505.09388)
 @article{yang2025qwen3,
   title   = {Qwen3 Technical Report},
   author  = {Yang, An and others},
   journal = {arXiv preprint arXiv:2505.09388},
   year    = {2025},
   eprint  = {2505.09388},
+  url       = {https://arxiv.org/abs/2505.09388},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -281,13 +303,14 @@
 % verified_finding: Routing analysis -- OLMoE-1B-7B (64 experts, top-8) shows that "routing
 %   saturates early in pretraining, experts are rarely co-activated, and experts exhibit
 %   domain and vocabulary specialization" -- direct evidence for MoE routing structure.
-% source: chrome/curl, html-read (arxiv.org/html/2409.02060)
+% source: local pdf refpdfs/2409.02060.pdf sha256:44511ee5d5a9; orig: chrome/curl, html-read (arxiv.org/html/2409.02060)
 @article{muennighoff2024olmoe,
   title   = {OLMoE: Open Mixture-of-Experts Language Models},
   author  = {Muennighoff, Niklas and Soldaini, Luca and Groeneveld, Dirk and Lo, Kyle and Morrison, Jacob and Min, Sewon and Shi, Weijia and Walsh, Pete and Tafjord, Oyvind and Lambert, Nathan and others},
   journal = {arXiv preprint arXiv:2409.02060},
   year    = {2024},
   eprint  = {2409.02060},
+  url       = {https://arxiv.org/abs/2409.02060},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -295,13 +318,14 @@
 % verified_finding: Abstract/Method -- Multi-head Latent Attention (MLA) compresses the KV
 %   cache into a low-rank latent, "reduces the KV cache by 93.3%" and boosts max generation
 %   throughput; the 236B model activates only 21B params per token.
-% source: chrome/curl, html-read (arxiv.org/html/2405.04434)
+% source: local pdf refpdfs/2405.04434.pdf sha256:f149f9c09aa8; orig: chrome/curl, html-read (arxiv.org/html/2405.04434)
 @article{deepseekai2024deepseekv2,
   title   = {DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model},
   author  = {{DeepSeek-AI}},
   journal = {arXiv preprint arXiv:2405.04434},
   year    = {2024},
   eprint  = {2405.04434},
+  url       = {https://arxiv.org/abs/2405.04434},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -309,13 +333,14 @@
 % verified_finding: Intro -- 146B-param, 16-expert MoE; introduces two training techniques:
 %   "gating logit normalization, which improves expert diversification" and adaptive
 %   (layer-specific) auxiliary-loss coefficients.
-% source: chrome/curl, html-read (arxiv.org/html/2406.06563)
+% source: local pdf refpdfs/2406.06563.pdf sha256:51adefc28c8d; orig: chrome/curl, html-read (arxiv.org/html/2406.06563)
 @article{wei2024skyworkmoe,
   title   = {Skywork-MoE: A Deep Dive into Training Techniques for Mixture-of-Experts Language Models},
   author  = {Wei, Tianwen and Zhu, Bo and Zhao, Liang and Cheng, Cheng and Li, Biye and L{\"u}, Weiwei and Cheng, Peng and Zhang, Jianhao and Zhang, Xiaoyu and Zeng, Liang and others},
   journal = {arXiv preprint arXiv:2406.06563},
   year    = {2024},
   eprint  = {2406.06563},
+  url       = {https://arxiv.org/abs/2406.06563},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -323,13 +348,14 @@
 % verified_finding: Results -- achieves up to 10.3x higher throughput than SOTA
 %   offloading-enabled inference systems for Mixtral 8x7B on a single 16GB T4 GPU, using a
 %   CPU-GPU-I/O pipeline (CGOPipe) and a roofline-guided (HBM-aware) scheduler.
-% source: chrome/curl, html-read (arxiv.org/html/2411.11217)
+% source: local pdf refpdfs/2411.11217.pdf sha256:8fee924ef89f; orig: chrome/curl, html-read (arxiv.org/html/2411.11217)
 @article{cao2024moelightning,
   title   = {MoE-Lightning: High-Throughput MoE Inference on Memory-constrained GPUs},
   author  = {Cao, Shiyi and Liu, Shu and Griggs, Tyler and Schafhalter, Peter and Liu, Xiaoxuan and Sheng, Ying and Gonzalez, Joseph E. and Zaharia, Matei and Stoica, Ion},
   journal = {arXiv preprint arXiv:2411.11217},
   year    = {2024},
   eprint  = {2411.11217},
+  url       = {https://arxiv.org/abs/2411.11217},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -337,13 +363,14 @@
 % verified_finding: Abstract/Results -- adaptive sensitivity-based gating reduces the average
 %   number of activated experts by 25% vs top-2 and yields a 1.35x speedup without accuracy
 %   degradation (fewer experts activated => fewer bytes fetched from offload memory).
-% source: chrome/curl, html-read (arxiv.org/html/2408.10284)
+% source: local pdf refpdfs/2408.10284.pdf sha256:34070a027153; orig: chrome/curl, html-read (arxiv.org/html/2408.10284)
 @article{zhong2024adapmoe,
   title   = {AdapMoE: Adaptive Sensitivity-based Expert Gating and Management for Efficient MoE Inference},
   author  = {Zhong, Shuzhang and Liang, Ling and Wang, Yuan and Wang, Runsheng and Huang, Ru and Li, Meng},
   journal = {arXiv preprint arXiv:2408.10284},
   year    = {2024},
   eprint  = {2408.10284},
+  url       = {https://arxiv.org/abs/2408.10284},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -351,13 +378,14 @@
 % verified_finding: Method/Results -- three hierarchy-aware techniques (token-level dynamic
 %   expert loading, layer-level adaptive prefetching, sequence-level multidimensional expert
 %   caching) give up to 9.93x decoding speedup over SOTA MoE offloading systems.
-% source: chrome/curl, html-read (arxiv.org/html/2411.01433)
+% source: local pdf refpdfs/2411.01433.pdf sha256:ea71f41bf4e9; orig: chrome/curl, html-read (arxiv.org/html/2411.01433)
 @article{tang2024hobbit,
   title   = {HOBBIT: A Mixed Precision Expert Offloading System for Fast MoE Inference},
   author  = {Tang, Peng and Liu, Jiacheng and Hou, Xiaofeng and Pu, Yifei and Wang, Jing and Heng, Pheng-Ann and Li, Chao and Guo, Minyi},
   journal = {arXiv preprint arXiv:2411.01433},
   year    = {2024},
   eprint  = {2411.01433},
+  url       = {https://arxiv.org/abs/2411.01433},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -365,13 +393,14 @@
 % verified_finding: Results -- a learned predictor proactively prefetches experts before they
 %   are needed, hiding load latency; ProMoE gets an average 2.20x (up to 3.21x) speedup in
 %   prefill and 2.07x in decode over reactive-caching offloading baselines.
-% source: chrome/curl, html-read (arxiv.org/html/2410.22134)
+% source: local pdf refpdfs/2410.22134.pdf sha256:14b3f073978c; orig: chrome/curl, html-read (arxiv.org/html/2410.22134)
 @article{song2024promoe,
   title   = {ProMoE: Fast MoE-based LLM Serving using Proactive Caching},
   author  = {Song, Xiaoniu and Zhong, Zihang and Chen, Rong and Chen, Haibo},
   journal = {arXiv preprint arXiv:2410.22134},
   year    = {2024},
   eprint  = {2410.22134},
+  url       = {https://arxiv.org/abs/2410.22134},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -379,13 +408,14 @@
 % verified_finding: Results/Table 1 -- module-based batching yields 8-31x higher throughput
 %   than model-based-batching systems (FlexGen, MoE-Lightning, DeepSpeed) serving DeepSeek-V2
 %   236B on a single 24GB A5000 with 512GB host memory.
-% source: chrome/curl, html-read (arxiv.org/html/2503.09716)
+% source: local pdf refpdfs/2503.09716.pdf sha256:fd5b715fe0f7; orig: chrome/curl, html-read (arxiv.org/html/2503.09716)
 @article{xu2025moegen,
   title   = {MoE-Gen: High-Throughput MoE Inference on a Single GPU with Module-Based Batching},
   author  = {Xu, Tairan and Xue, Leyang and Lu, Zhan and Jackson, Adrian and Mai, Luo},
   journal = {arXiv preprint arXiv:2503.09716},
   year    = {2025},
   eprint  = {2503.09716},
+  url       = {https://arxiv.org/abs/2503.09716},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -393,7 +423,7 @@
 % verified_finding: Method -- keeps only a tunable "working set" of hot experts in memory;
 %   ablation shows the memory/accuracy tradeoff (e.g. pruning experts to cut memory 30% on
 %   Switch-T-32 drops accuracy 14%), so the working-set size must be tuned to the budget.
-% source: chrome/curl, html-read (arxiv.org/html/2308.15030)
+% source: local pdf refpdfs/2308.15030.pdf sha256:50019d436167; orig: chrome/curl, html-read (arxiv.org/html/2308.15030)
 @article{kong2024swapmoe,
   title   = {SwapMoE: Serving Off-the-shelf MoE-based Large Language Models with Tunable Memory Budget},
   author  = {Kong, Rui and Li, Yuanchun and Feng, Qingtian and Wang, Weijun and Ye, Xiaozhou and Ouyang, Ye and Kong, Linghe and Liu, Yunxin},
@@ -401,6 +431,7 @@
   year    = {2023},
   note    = {ACL 2024},
   eprint  = {2308.15030},
+  url       = {https://arxiv.org/abs/2308.15030},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -412,13 +443,14 @@
 % verified_finding: Results -- GPT-175B needs 325GB just to load weights; with a zig-zag
 %   block schedule and offloading, FlexGen runs OPT-175B on a single 16GB GPU at 1 token/s
 %   generation for the first time (effective batch size 144) -- a memory-bound regime.
-% source: chrome/curl, html-read (arxiv.org/html/2303.06865)
+% source: local pdf refpdfs/2303.06865.pdf sha256:87896692bafa; orig: chrome/curl, html-read (arxiv.org/html/2303.06865)
 @article{sheng2023flexgen,
   title   = {FlexGen: High-Throughput Generative Inference of Large Language Models with a Single GPU},
   author  = {Sheng, Ying and Zheng, Lianmin and Yuan, Binhang and Li, Zhuohan and Ryabinin, Max and Fu, Daniel Y. and Xie, Zhiqiang and Chen, Beidi and Barrett, Clark and Gonzalez, Joseph E. and Liang, Percy and R{\'e}, Christopher and Stoica, Ion and Zhang, Ce},
   journal = {arXiv preprint arXiv:2303.06865},
   year    = {2023},
   eprint  = {2303.06865},
+  url       = {https://arxiv.org/abs/2303.06865},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -426,13 +458,14 @@
 % verified_finding: Abstract -- a heterogeneous CPU+NVMe+GPU inference engine reduces latency
 %   by up to 7.3x and increases throughput by over 1.5x, enabling inference of models that do
 %   not fit in aggregate GPU memory (up to trillion-parameter scale).
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2207.00032)
+% source: local pdf refpdfs/2207.00032.pdf sha256:87b6df99f566; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2207.00032)
 @article{aminabadi2022deepspeed,
   title   = {DeepSpeed Inference: Enabling Efficient Inference of Transformer Models at Unprecedented Scale},
   author  = {Aminabadi, Reza Yazdani and Rajbhandari, Samyam and Zhang, Minjia and Awan, Ammar Ahmad and Li, Cheng and Li, Du and Zheng, Elton and Rasley, Jeff and Smith, Shaden and Ruwase, Olatunji and He, Yuxiong},
   journal = {arXiv preprint arXiv:2207.00032},
   year    = {2022},
   eprint  = {2207.00032},
+  url       = {https://arxiv.org/abs/2207.00032},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -440,13 +473,14 @@
 % verified_finding: Results -- an analytic partitioning + roofline study: achieves 29ms/token
 %   low-batch generation latency (int8 weights) and 76% MFU on large-batch input processing of
 %   PaLM 540B, quantifying the memory-bandwidth vs compute (MFU) tradeoff in decode.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2211.05102)
+% source: local pdf refpdfs/2211.05102.pdf sha256:a34aacd15d1d; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2211.05102)
 @article{pope2022scaling,
   title   = {Efficiently Scaling Transformer Inference},
   author  = {Pope, Reiner and Douglas, Sholto and Chowdhery, Aakanksha and Devlin, Jacob and Bradbury, James and Levskaya, Anselm and Heek, Jonathan and Xiao, Kefan and Agrawal, Shivani and Dean, Jeff},
   journal = {arXiv preprint arXiv:2211.05102},
   year    = {2022},
   eprint  = {2211.05102},
+  url       = {https://arxiv.org/abs/2211.05102},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -458,13 +492,14 @@
 % verified_finding: Results -- one-shot layerwise PTQ that "more than doubles the compression
 %   gains" of prior methods and, for the first time, runs a 175B-parameter model (OPT/BLOOM-175B)
 %   for generative inference inside a single GPU at 3-4 bits with preserved accuracy.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2210.17323)
+% source: local pdf refpdfs/2210.17323.pdf sha256:35e339171cd4; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2210.17323)
 @inproceedings{frantar2023gptq,
   title     = {GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers},
   author    = {Frantar, Elias and Ashkboos, Saleh and Hoefler, Torsten and Alistarh, Dan},
   booktitle = {International Conference on Learning Representations (ICLR)},
   year      = {2023},
   eprint    = {2210.17323},
+  url       = {https://arxiv.org/abs/2210.17323},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -472,13 +507,14 @@
 % verified_finding: Method -- observes that "protecting only 1% salient weights can greatly
 %   reduce quantization error", and that salient channels are identified from the ACTIVATION
 %   distribution (not weights); protects them via a per-channel equivalent scaling transform.
-% source: chrome/curl, html-read (arxiv.org/html/2306.00978)
+% source: local pdf refpdfs/2306.00978.pdf sha256:6e35c8fe7af1; orig: chrome/curl, html-read (arxiv.org/html/2306.00978)
 @inproceedings{lin2024awq,
   title     = {AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration},
   author    = {Lin, Ji and Tang, Jiaming and Tang, Haotian and Yang, Shang and Chen, Wei-Ming and Wang, Wei-Chen and Xiao, Guangxuan and Dang, Xingyu and Gan, Chuang and Han, Song},
   booktitle = {Proceedings of Machine Learning and Systems (MLSys)},
   year      = {2024},
   eprint    = {2306.00978},
+  url       = {https://arxiv.org/abs/2306.00978},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -486,13 +522,14 @@
 % verified_finding: Results -- migrates quantization difficulty from activations to weights via
 %   a per-channel smoothing factor, enabling W8A8; integrated into FasterTransformer it gives up
 %   to 1.56x speedup and halves memory vs FP16 with negligible accuracy loss.
-% source: chrome/curl, html-read (arxiv.org/html/2211.10438)
+% source: local pdf refpdfs/2211.10438.pdf sha256:d17856490ff6; orig: chrome/curl, html-read (arxiv.org/html/2211.10438)
 @inproceedings{xiao2023smoothquant,
   title     = {SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models},
   author    = {Xiao, Guangxuan and Lin, Ji and Seznec, Mickael and Wu, Hao and Demouth, Julien and Han, Song},
   booktitle = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
   year      = {2023},
   eprint    = {2211.10438},
+  url       = {https://arxiv.org/abs/2211.10438},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -500,13 +537,14 @@
 % verified_finding: Results -- learned rotations remove activation outliers; the choice of
 %   rotation matters (up to 13-point zero-shot swing). With 4-bit weight+activation+KV-cache,
 %   SpinQuant narrows the gap to full precision to just 2.9 points on LLaMA-2 7B.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2405.16406)
+% source: local pdf refpdfs/2405.16406.pdf sha256:fe437770d7c9; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2405.16406)
 @inproceedings{liu2025spinquant,
   title     = {SpinQuant: LLM Quantization with Learned Rotations},
   author    = {Liu, Zechun and Zhao, Changsheng and Fedorov, Igor and Soran, Bilge and Choudhary, Dhruv and Krishnamoorthi, Raghuraman and Chandra, Vikas and Tian, Yuandong and Blankevoort, Tijmen},
   booktitle = {International Conference on Learning Representations (ICLR)},
   year      = {2025},
   eprint    = {2405.16406},
+  url       = {https://arxiv.org/abs/2405.16406},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -514,13 +552,14 @@
 % verified_finding: Method -- introduces BitLinear as a drop-in replacement for nn.Linear and
 %   trains 1-bit Transformers from scratch, reaching competitive LM perplexity while
 %   substantially cutting memory footprint and energy vs 8-bit PTQ and FP16 baselines.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2310.11453)
+% source: local pdf refpdfs/2310.11453.pdf sha256:55424deeba35; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2310.11453)
 @article{wang2023bitnet,
   title   = {BitNet: Scaling 1-bit Transformers for Large Language Models},
   author  = {Wang, Hongyu and Ma, Shuming and Dong, Li and Huang, Shaohan and Wang, Huaijie and Ma, Lingxiao and Yang, Fan and Wang, Ruiping and Wu, Yi and Wei, Furu},
   journal = {arXiv preprint arXiv:2310.11453},
   year    = {2023},
   eprint  = {2310.11453},
+  url       = {https://arxiv.org/abs/2310.11453},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -528,13 +567,14 @@
 % verified_finding: Claim -- every weight is ternary {-1,0,1} (1.58 bits); BitNet b1.58 matches
 %   a full-precision FP16/BF16 Transformer of the same size and training tokens in perplexity and
 %   end-task performance while being far cheaper in latency, memory, throughput, and energy.
-% source: chrome/curl, html-read (arxiv.org/html/2402.17764)
+% source: local pdf refpdfs/2402.17764.pdf sha256:bcd625e89f95; orig: chrome/curl, html-read (arxiv.org/html/2402.17764)
 @article{ma2024bitnet158,
   title   = {The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits},
   author  = {Ma, Shuming and Wang, Hongyu and Ma, Lingxiao and Wang, Lei and Wang, Wenhui and Huang, Shaohan and Dong, Li and Wang, Ruiping and Xue, Jilong and Wei, Furu},
   journal = {arXiv preprint arXiv:2402.17764},
   year    = {2024},
   eprint  = {2402.17764},
+  url       = {https://arxiv.org/abs/2402.17764},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -542,7 +582,7 @@
 % verified_finding: Findings -- a unified framework comparing 1/1.58/2/3/4-bit shows a sharp
 %   learning transition between 2 and 3 bits; a ParetoQ ternary 600M model outperforms the prior
 %   SoTA ternary 3B model in accuracy using one-fifth the parameters.
-% source: chrome/curl, html-read (arxiv.org/html/2502.02631)
+% source: local pdf refpdfs/2502.02631.pdf sha256:8c9b4ec1beae; orig: chrome/curl, html-read (arxiv.org/html/2502.02631)
 @article{liu2025paretoq,
   title   = {ParetoQ: Improving Scaling Laws in Extremely Low-bit LLM Quantization},
   author  = {Liu, Zechun and Zhao, Changsheng and Huang, Hanxian and Chen, Sijia and Zhang, Jing and Zhao, Jiawei and Roy, Scott and Jin, Lisa and Xiong, Yunyang and Shi, Yangyang and others},
@@ -550,6 +590,7 @@
   year    = {2025},
   note    = {NeurIPS 2025},
   eprint  = {2502.02631},
+  url       = {https://arxiv.org/abs/2502.02631},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -557,7 +598,7 @@
 % verified_finding: Method -- backprops through a frozen 4-bit NF4-quantized model into LoRA
 %   adapters, letting a 65B model be finetuned on a single 48GB GPU while preserving full 16-bit
 %   task performance (uses NF4 + double quantization + paged optimizers).
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2305.14314)
+% source: local pdf refpdfs/2305.14314.pdf sha256:33a4e757c19d; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2305.14314)
 @article{dettmers2023qlora,
   title   = {QLoRA: Efficient Finetuning of Quantized LLMs},
   author  = {Dettmers, Tim and Pagnoni, Artidoro and Holtzman, Ari and Zettlemoyer, Luke},
@@ -565,6 +606,7 @@
   year    = {2023},
   note    = {NeurIPS 2023},
   eprint  = {2305.14314},
+  url       = {https://arxiv.org/abs/2305.14314},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -572,13 +614,14 @@
 % verified_finding: Method -- identifies emergent activation outlier feature dimensions and
 %   isolates them into a 16-bit mixed-precision decomposition, so a 175B 16/32-bit checkpoint can
 %   be run in Int8 immediately "without performance degradation".
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2208.07339)
+% source: local pdf refpdfs/2208.07339.pdf sha256:40da3ce2d38e; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2208.07339)
 @inproceedings{dettmers2022llmint8,
   title     = {LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale},
   author    = {Dettmers, Tim and Lewis, Mike and Belkada, Younes and Zettlemoyer, Luke},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   year      = {2022},
   eprint    = {2208.07339},
+  url       = {https://arxiv.org/abs/2208.07339},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -590,13 +633,14 @@
 % verified_finding: Method -- identifies "attention sink" tokens (the first few tokens absorb
 %   large attention mass); keeping their KV plus a sliding window lets Llama-2/MPT/Falcon/Pythia
 %   model 4M+ tokens stably, with up to 22.2x speedup over sliding-window recomputation.
-% source: chrome/curl, html-read (arxiv.org/html/2309.17453)
+% source: local pdf refpdfs/2309.17453.pdf sha256:e8a7de67c7c5; orig: chrome/curl, html-read (arxiv.org/html/2309.17453)
 @inproceedings{xiao2024streamingllm,
   title     = {Efficient Streaming Language Models with Attention Sinks},
   author    = {Xiao, Guangxuan and Tian, Yuandong and Chen, Beidi and Han, Song and Lewis, Mike},
   booktitle = {International Conference on Learning Representations (ICLR)},
   year      = {2024},
   eprint    = {2309.17453},
+  url       = {https://arxiv.org/abs/2309.17453},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -604,13 +648,14 @@
 % verified_finding: Method/Results -- a small set of "Heavy Hitter" (H2) tokens accounts for
 %   most attention; an eviction policy keeping recent + H2 tokens (20% heavy hitters) raises
 %   throughput up to 29x / 29x / 3x over DeepSpeed Zero-Inference, HF Accelerate, and FlexGen.
-% source: chrome/curl, html-read (arxiv.org/html/2306.14048)
+% source: local pdf refpdfs/2306.14048.pdf sha256:f2d699db2c1f; orig: chrome/curl, html-read (arxiv.org/html/2306.14048)
 @article{zhang2023h2o,
   title   = {H2O: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models},
   author  = {Zhang, Zhenyu and Sheng, Ying and Zhou, Tianyi and Chen, Tianlong and Zheng, Lianmin and Cai, Ruisi and Song, Zhao and Tian, Yuandong and R{\'e}, Christopher and Barrett, Clark and Wang, Zhangyang and Chen, Beidi},
   journal = {arXiv preprint arXiv:2306.14048},
   year    = {2023},
   eprint  = {2306.14048},
+  url       = {https://arxiv.org/abs/2306.14048},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -618,13 +663,14 @@
 % verified_finding: Results -- splits heads into "retrieval" heads (need full KV) and
 %   "streaming" heads (need only sink+recent KV); reduces long-context memory up to 2.55x (MHA)
 %   / 1.67x (GQA) and speeds decoding up to 2.18x (MHA) with negligible accuracy loss.
-% source: chrome/curl, html-read (arxiv.org/html/2410.10819)
+% source: local pdf refpdfs/2410.10819.pdf sha256:0c121d19e509; orig: chrome/curl, html-read (arxiv.org/html/2410.10819)
 @article{xiao2024duoattention,
   title   = {DuoAttention: Efficient Long-Context LLM Inference with Retrieval and Streaming Heads},
   author  = {Xiao, Guangxuan and Tang, Jiaming and Zuo, Jingwei and Guo, Junxian and Yang, Shang and Tang, Haotian and Fu, Yao and Han, Song},
   journal = {arXiv preprint arXiv:2410.10819},
   year    = {2024},
   eprint  = {2410.10819},
+  url       = {https://arxiv.org/abs/2410.10819},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -636,13 +682,14 @@
 % verified_finding: Results -- a small approximation model proposes tokens that the target model
 %   verifies in parallel via a novel sampling scheme that provably keeps the target's output
 %   distribution unchanged; gives 2X-3X wall-time acceleration on T5-XXL with identical outputs.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2211.17192)
+% source: local pdf refpdfs/2211.17192.pdf sha256:8967e2daab74; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2211.17192)
 @inproceedings{leviathan2023speculative,
   title     = {Fast Inference from Transformers via Speculative Decoding},
   author    = {Leviathan, Yaniv and Kalman, Matan and Matias, Yossi},
   booktitle = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
   year      = {2023},
   eprint    = {2211.17192},
+  url       = {https://arxiv.org/abs/2211.17192},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -650,13 +697,14 @@
 % verified_finding: Results -- adds multiple decoding heads to predict several future tokens and
 %   verifies them with tree attention (no separate draft model); Medusa-1 gives >2.2x speedup and
 %   Medusa-2 reaches 2.3-2.8x without compromising generation quality.
-% source: chrome/curl, html-read (arxiv.org/html/2401.10774)
+% source: local pdf refpdfs/2401.10774.pdf sha256:93d98f2e858c; orig: chrome/curl, html-read (arxiv.org/html/2401.10774)
 @article{cai2024medusa,
   title   = {Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads},
   author  = {Cai, Tianle and Li, Yuhong and Geng, Zhengyang and Peng, Hongwu and Lee, Jason D. and Chen, Deming and Dao, Tri},
   journal = {arXiv preprint arXiv:2401.10774},
   year    = {2024},
   eprint  = {2401.10774},
+  url       = {https://arxiv.org/abs/2401.10774},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -664,13 +712,14 @@
 % verified_finding: Results -- drafts at the FEATURE (second-to-top-layer) level rather than the
 %   token level, resolving feature uncertainty by feeding the sampled token; achieves a 2.7x-3.x
 %   latency speedup on LLaMA2-Chat 70B while preserving the output distribution.
-% source: chrome/curl, html-read (arxiv.org/html/2401.15077)
+% source: local pdf refpdfs/2401.15077.pdf sha256:3484aad4d255; orig: chrome/curl, html-read (arxiv.org/html/2401.15077)
 @article{li2024eagle,
   title   = {EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty},
   author  = {Li, Yuhui and Wei, Fangyun and Zhang, Chao and Zhang, Hongyang},
   journal = {arXiv preprint arXiv:2401.15077},
   year    = {2024},
   eprint  = {2401.15077},
+  url       = {https://arxiv.org/abs/2401.15077},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -678,13 +727,14 @@
 % verified_finding: Results -- replaces EAGLE's static draft tree with a "context-aware dynamic
 %   draft tree" (expanding/reranking by draft-model confidence); across 3 LLM series and 6 tasks
 %   EAGLE-2 reaches 3.05x-4.x speedup, higher than EAGLE, with lossless output.
-% source: chrome/curl, html-read (arxiv.org/html/2406.16858)
+% source: local pdf refpdfs/2406.16858.pdf sha256:712a5af2ca19; orig: chrome/curl, html-read (arxiv.org/html/2406.16858)
 @article{li2024eagle2,
   title   = {EAGLE-2: Faster Inference of Language Models with Dynamic Draft Trees},
   author  = {Li, Yuhui and Wei, Fangyun and Zhang, Chao and Zhang, Hongyang},
   journal = {arXiv preprint arXiv:2406.16858},
   year    = {2024},
   eprint  = {2406.16858},
+  url       = {https://arxiv.org/abs/2406.16858},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -692,13 +742,14 @@
 % verified_finding: Method -- abandons feature prediction for direct token prediction and fuses
 %   multi-layer (not just top-layer) features via a "training-time test" procedure, lifting the
 %   speedup ratio to up to 6.5x.
-% source: chrome/curl, html-read (arxiv.org/html/2503.01840)
+% source: local pdf refpdfs/2503.01840.pdf sha256:8a178337a1b0; orig: chrome/curl, html-read (arxiv.org/html/2503.01840)
 @article{li2025eagle3,
   title   = {EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test},
   author  = {Li, Yuhui and Wei, Fangyun and Zhang, Chao and Zhang, Hongyang},
   journal = {arXiv preprint arXiv:2503.01840},
   year    = {2025},
   eprint  = {2503.01840},
+  url       = {https://arxiv.org/abs/2503.01840},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -706,13 +757,14 @@
 % verified_finding: Results -- tree-based speculative inference with token-tree verification
 %   reduces memory accesses to LLM weights and cuts end-to-end latency by 1.5-2.8x (distributed)
 %   and 2.6-3.5x (offloading-based) inference while preserving generative accuracy.
-% source: chrome/curl, html-read (arxiv.org/html/2305.09781)
+% source: local pdf refpdfs/2305.09781.pdf sha256:38764bfe741d; orig: chrome/curl, html-read (arxiv.org/html/2305.09781)
 @inproceedings{miao2024specinfer,
   title     = {SpecInfer: Accelerating Generative Large Language Model Serving with Tree-based Speculative Inference and Verification},
   author    = {Miao, Xupeng and Oliaro, Gabriele and Zhang, Zhihao and Cheng, Xinhao and Wang, Zeyu and Zhang, Zhengxin and Wong, Rae Ying Yee and Zhu, Alan and Yang, Lijie and Shi, Xiaoxiang and others},
   booktitle = {Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)},
   year      = {2024},
   eprint    = {2305.09781},
+  url       = {https://arxiv.org/abs/2305.09781},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -724,13 +776,14 @@
 % verified_finding: Results -- a collaborative "swarm" that splits a model across volunteer
 %   nodes; outperforms local offloading for very large models, running BLOOM-176B inference on
 %   consumer GPUs at ~1 step/second, sufficient for interactive use.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2209.01188)
+% source: local pdf refpdfs/2209.01188.pdf sha256:e60c77b665f3; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2209.01188)
 @article{borzunov2023petals,
   title   = {Petals: Collaborative Inference and Fine-tuning of Large Models},
   author  = {Borzunov, Alexander and Baranchuk, Dmitry and Dettmers, Tim and Ryabinin, Max and Belkada, Younes and Chumachenko, Artem and Samygin, Pavel and Raffel, Colin},
   journal = {arXiv preprint arXiv:2209.01188},
   year    = {2022},
   eprint  = {2209.01188},
+  url       = {https://arxiv.org/abs/2209.01188},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -738,13 +791,14 @@
 % verified_finding: Results -- optimally partitions a transformer pipeline across heterogeneous
 %   edge devices; EdgePipe achieves 10.59x and 11.88x speedup with 16 edge devices for ViT-Large
 %   and ViT-Huge respectively, with no accuracy loss.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2110.14895)
+% source: local pdf refpdfs/2110.14895.pdf sha256:c771323f3bc1; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2110.14895)
 @article{hu2022pipeedge,
   title   = {Pipeline Parallelism for Inference on Heterogeneous Edge Computing},
   author  = {Hu, Yang and Imes, Connor and Zhao, Xuanang and Kundu, Souvik and Beerel, Peter A. and Crago, Stephen P. and Walters, John Paul N.},
   journal = {arXiv preprint arXiv:2110.14895},
   year    = {2021},
   eprint  = {2110.14895},
+  url       = {https://arxiv.org/abs/2110.14895},
   archivePrefix = {arXiv},
   primaryClass  = {cs.DC}
 }
@@ -756,13 +810,14 @@
 % verified_finding: Analysis -- uses a roofline model to argue LLM decode is memory-bound:
 %   "the attention operator is memory-bounded, [so] the reduction of memory access effectively
 %   transfers to runtime speed-up"; organizes methods into data-/model-/system-level taxonomy.
-% source: chrome/curl, html-read (arxiv.org/html/2404.14294)
+% source: local pdf refpdfs/2404.14294.pdf sha256:4a9d2c4bd26c; orig: chrome/curl, html-read (arxiv.org/html/2404.14294)
 @article{zhou2024survey,
   title   = {A Survey on Efficient Inference for Large Language Models},
   author  = {Zhou, Zixuan and Ning, Xuefei and Hong, Ke and Fu, Tianyu and Xu, Jiaming and Li, Shiyao and Lou, Yuming and Wang, Luning and Yuan, Zhihang and Li, Xiuhong and others},
   journal = {arXiv preprint arXiv:2404.14294},
   year    = {2024},
   eprint  = {2404.14294},
+  url       = {https://arxiv.org/abs/2404.14294},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
 }
@@ -774,13 +829,14 @@
 % verified_finding: Body -- surveys sparse expert models and taxonomizes routing: distinguishes
 %   token-choice top-k routing from "globally decide expert assignment" methods (e.g. BASE layers'
 %   linear-assignment routing), unifying MoE, Switch, Routing Networks and BASE layers.
-% source: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2209.01667)
+% source: local pdf refpdfs/2209.01667.pdf sha256:937da332418e; orig: chrome/curl, html-read (ar5iv.labs.arxiv.org/html/2209.01667)
 @article{fedus2022review,
   title   = {A Review of Sparse Expert Models in Deep Learning},
   author  = {Fedus, William and Dean, Jeff and Zoph, Barret},
   journal = {arXiv preprint arXiv:2209.01667},
   year    = {2022},
   eprint  = {2209.01667},
+  url       = {https://arxiv.org/abs/2209.01667},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG}
 }
@@ -788,13 +844,199 @@
 % verified_finding: Body -- the released 7B-based Jamba (12B active / 52B total params) combines
 %   Transformer, Mamba (SSM) and MoE layers and is designed to fit a single 80GB GPU while giving
 %   strong results at up to 256K-token context -- a memory-efficient hybrid MoE design point.
-% source: chrome/curl, html-read (arxiv.org/html/2403.19887)
+% source: local pdf refpdfs/2403.19887.pdf sha256:517673951e0f; orig: chrome/curl, html-read (arxiv.org/html/2403.19887)
 @article{lieber2024jamba,
   title   = {Jamba: A Hybrid Transformer-Mamba Language Model},
   author  = {Lieber, Opher and Lenz, Barak and Bata, Hofit and Cohen, Gal and Osin, Jhonathan and Dalmedigos, Itay and Safahi, Erez and Meirom, Shaked and Belinkov, Yonatan and Shalev-Shwartz, Shai and others},
   journal = {arXiv preprint arXiv:2403.19887},
   year    = {2024},
   eprint  = {2403.19887},
+  url       = {https://arxiv.org/abs/2403.19887},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL}
+}
+
+% ===================================================================
+% CONCURRENT / PRIOR WORK ON TRAINING-TIME ROUTING LOCALITY (added post-review)
+% verified_finding: "StickyMoE" -- a differentiable routing-consistency (soft) loss
+%   penalising abrupt expert switches between adjacent tokens (single lambda, no arch
+%   change). On SMALL (8.8M) and MEDIUM (22M) MoE LMs on WikiText-2 (single domain):
+%   expert switch rate reduced up to 59%; Soft lambda=0.05 gives BEST PPL -4.1% (small)
+%   and -0.9% (medium) i.e. perplexity IMPROVES, not degrades; cache misses reduced up
+%   to 3.92x; Soft-Hard reaches SR 0.274 at +0.4% PPL. "Pareto-dominating post-hoc
+%   fine-tuning." arXiv stamp 12 Jun 2026. DIRECT CONCURRENT WORK; note their positive
+%   (near-free) result is on single-domain tiny models -- see our multi-domain 137M tension.
+% source: local pdf refpdfs/2607.08780.pdf sha256:d7f49b94c181; orig: chrome/curl, FULL-PDF read (arxiv.org/abs/2607.08780), authors verified.
+@article{kayyam2026sticky,
+  title   = {Sticky Routing: Training {MoE} Models for Memory-Efficient Inference},
+  author  = {Kayyam, Ali},
+  journal = {arXiv preprint arXiv:2607.08780},
+  year    = {2026},
+  eprint  = {2607.08780},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2607.08780}
+}
+
+% verified_finding: expert-locality-aware decode routing for PD-disaggregated MoE serving.
+%   From a request's prefill expert activations, builds an "expert signature" predicting the
+%   experts it will activate during generation; balanced K-means partitions signature space
+%   across decode workers; locality-band routing sends each request to the least-loaded best-
+%   matching worker. Implemented in vLLM, evaluated up to 40 GPUs: median TPOT reduced
+%   5.9-13.9% over the strongest of four load-balancing baselines, model outputs unchanged.
+% source: local pdf refpdfs/2607.00466.pdf sha256:d02301a2ef52; orig: chrome/curl, FULL-PDF read (arxiv.org/abs/2607.00466), authors verified.
+@article{eldr2026,
+  title   = {{ELDR}: Expert-Locality-Aware Decode Routing for {PD}-Disaggregated {MoE} Serving},
+  author  = {Choi, Sangjin and Cho, Sukmin and Xiong, Yifan and Yang, Ziyue and Kwon, Youngjin and Cheng, Peng},
+  journal = {arXiv preprint arXiv:2607.00466},
+  year    = {2026},
+  eprint  = {2607.00466},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2607.00466}
+}
+
+% verified_finding: a TRAINING-FREE cache-aware routing strategy (NOT trained experts) for
+%   mobile MoE inference where only a subset of experts fit in DRAM. Exploits that MoEs
+%   tolerate careful deviations in expert selection with minimal loss; routing leverages
+%   expert reuse to raise cache locality. On LM, MMLU, GSM8K: cache miss rate reduced >50%
+%   with 0.1%-3% perplexity impact and <0.1% downstream-accuracy impact; SURPASSES the
+%   optimal-oracle cache bound by allowing slight selection flexibility; 2x on-device speedup.
+%   Single-domain benchmarks. Published TMLR June 2025.
+% source: local pdf refpdfs/2412.00099.pdf sha256:3f62454e4d4e; orig: chrome/curl, FULL-PDF read (arxiv.org/abs/2412.00099), authors verified.
+@article{cachecond2024,
+  title   = {Mixture of Cache-Conditional Experts for Efficient Mobile Device Inference},
+  author  = {Skliar, Andrii and van Rozendaal, Ties and Lepert, Romain and Boinovski, Todor and van Baalen, Mart and Nagel, Markus and Whatmough, Paul and Bejnordi, Babak Ehteshami},
+  journal = {Transactions on Machine Learning Research (TMLR)},
+  year    = {2025},
+  eprint  = {2412.00099},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2412.00099}
+}
+
+% ===================================================================
+% LOCALITY-ROUTING & SUBSTITUTABILITY ADDITIONS (2026-08-14 discovery sweep)
+% All grounded from local PDFs in refpdfs/. See VERIFICATION.md and candidates.md.
+% ===================================================================
+
+% verified_finding: TRAINS routing for locality -- routes tokens in a compact "oracle space"
+%   derived from attention scores to preserve semantic locality across consecutive tokens and
+%   cut inter-token expert-activation variation; proves better locality bound theoretically.
+%   On GPT-2 of sizes 200M, 350M, 790M, 2B: SOTA inference speed across memory budgets WITHOUT
+%   compromising task performance. Closest prior to our train-time-locality thesis, and it runs
+%   the same 200M-2B size ladder as our scale study.
+% source: local pdf refpdfs/oracle-moe-zhou25b.pdf sha256:76c847c5898a; localpdf (ICML/PMLR, no arXiv), FULL-PDF read.
+@inproceedings{zhou2025oraclemoe,
+  title     = {{Oracle-MoE}: Locality-preserving Routing in the Oracle Space for Memory-constrained Large Language Model Inference},
+  author    = {Zhou, Jixian and Dong, Fang and Huang, Ruijun and Cao, Hengjie and Chen, Mengyi and Yang, Yifeng and Chen, Anrui and Dong, Mingzhi and Wang, Yujiang and Li, Dongsheng and Clifton, David A. and Lv, Qin and Zhu, Rui and Zhang, Chun and Yang, Fan and Lu, Tun and Gu, Ning and Shang, Li},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML)},
+  series    = {PMLR},
+  volume    = {267},
+  year      = {2025},
+  url       = {https://proceedings.mlr.press/v267/zhou25b.html}
+}
+
+% verified_finding: post-hoc router FINE-TUNING that biases the router toward short-horizon
+%   token-wise expert reuse (temporal-locality objective + Trust-KL anchor to the pretrained
+%   router); on DeepSeek and Qwen models improves expert reuse by 26% while maintaining
+%   downstream task performance, reducing storage expert fetches with no added inference-time
+%   compute. The "post-hoc fine-tuning" family our co-adapted training and StickyMoE contrast
+%   with. NOTE: distinct from the unrelated "ReMoE: Fully Differentiable MoE with ReLU Routing".
+% source: local pdf refpdfs/2605.27081.pdf sha256:63ea60292e2a; FULL-PDF read.
+@article{zhu2026remoe,
+  title   = {{ReMoE}: Boosting Expert Reuse through Router Fine-Tuning in Memory-Constrained MoE LLM Inference},
+  author  = {Zhu, Xiongwei and Liao, Xiaojian and Jiang, Tianyang and Zhang, Yusen and Wang, Liang and Xiao, Limin},
+  journal = {arXiv preprint arXiv:2605.27081},
+  year    = {2026},
+  eprint  = {2605.27081},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2605.27081}
+}
+
+% verified_finding: SMoE experts are REDUNDANT -- groups similar experts (by routing policy /
+%   output similarity) and merges them, then low-rank + structured-sparse compresses; MC-SMoE
+%   achieves up to 80% memory and 20% FLOPs reduction with virtually no performance loss.
+%   Direct evidence experts are mutually substitutable -- supports our co-adaptation mechanism.
+% source: local pdf refpdfs/2310.01334.pdf sha256:46f0846652cf; FULL-PDF read (ICLR 2024).
+@inproceedings{li2024mcsmoe,
+  title     = {Merge, Then Compress: Demystify Efficient {SMoE} with Hints from Its Routing Policy},
+  author    = {Li, Pingzhi and Zhang, Zhenyu and Yadav, Prateek and Sung, Yi-Lin and Cheng, Yu and Bansal, Mohit and Chen, Tianlong},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024},
+  eprint    = {2310.01334},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2310.01334}
+}
+
+% verified_finding: predicts next-layer expert selection from cross-layer gate correlation
+%   (residual similarity of adjacent-layer gate inputs), raising expert hit rate to 99% with no
+%   extra GPU overhead; up to 4.5x and 1.9x speedups. The predict/prefetch alternative to
+%   routing-for-locality (exploits that expert choice is temporally/cross-layer correlated).
+% source: local pdf refpdfs/2502.12224.pdf sha256:3a13f86484b1; FULL-PDF read.
+@article{fang2025fate,
+  title   = {{Fate}: Fast Edge Inference of Mixture-of-Experts Models via Cross-Layer Gate},
+  author  = {Fang, Zhiyuan and Hong, Zicong and Huang, Yuegui and Lyu, Yufeng and Chen, Wuhui and Yu, Yue and Yu, Fan and Zheng, Zibin},
+  journal = {arXiv preprint arXiv:2502.12224},
+  year    = {2025},
+  eprint  = {2502.12224},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2502.12224}
+}
+
+% verified_finding: data-aware expert offloading + predictive pre-calculation with a graceful-
+%   degradation accuracy mechanism; outperforms expert-caching by up to 8.20x and prefetching by
+%   1.35x while maintaining accuracy. Uses input/data-domain signal to guide expert management --
+%   the positive domain-signal line our domain-priming NEGATIVE result contrasts with.
+% source: local pdf refpdfs/2501.10375.pdf sha256:9f0a029767ea; FULL-PDF read.
+@article{zhang2025daop,
+  title   = {{DAOP}: Data-Aware Offloading and Predictive Pre-Calculation for Efficient MoE Inference},
+  author  = {Zhang, Yujie and Aggarwal, Shivam and Mitra, Tulika},
+  journal = {arXiv preprint arXiv:2501.10375},
+  year    = {2025},
+  eprint  = {2501.10375},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2501.10375}
+}
+
+% verified_finding: models MoE token routing as a congestion game with one effective parameter
+%   (congestion coefficient gamma_eff); tracking it across training checkpoints of two open MoE
+%   models reveals a three-phase trajectory ending in a stabilization phase where experts
+%   specialize under steady load balance. Supports our claim that experts co-adapt / differentiate
+%   during training.
+% source: local pdf refpdfs/2604.04230.pdf sha256:c3311b9d5b34; FULL-PDF read.
+@article{mouzouni2026threephases,
+  title   = {Three Phases of Expert Routing: How Load Balance Evolves During Mixture-of-Experts Training},
+  author  = {Mouzouni, Charafeddine},
+  journal = {arXiv preprint arXiv:2604.04230},
+  year    = {2026},
+  eprint  = {2604.04230},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2604.04230}
+}
+
+% verified_finding: FINE-TUNES an MoE to more strongly prefer activating a smaller set of experts
+%   per sequence (caching those preferred experts cuts churn); yields up to 3x fewer expert
+%   transfers vs the base model (Mixtral-8x7B). Post-hoc fine-tuning axis alongside ReMoE.
+% source: local pdf refpdfs/2602.11192.pdf sha256:a56dbd8b917b; FULL-PDF read.
+@article{raje2026melinoe,
+  title   = {{MELINOE}: Fine-Tuning Enables Memory-Efficient Inference for Mixture-of-Experts Models},
+  author  = {Raje, Arian and Nayak, Anupam and Joshi, Gauri},
+  journal = {arXiv preprint arXiv:2602.11192},
+  year    = {2026},
+  eprint  = {2602.11192},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2602.11192}
+}
+
+% verified_finding: system-stack survey of MoE inference-optimization techniques; establishes a
+%   taxonomy spanning model-, system-, and hardware-level optimizations (compression, expert
+%   offloading/caching, scheduling, co-design). Umbrella reference for the offloading/caching
+%   landscape our cache-miss study sits in.
+% source: local pdf refpdfs/2412.14219.pdf sha256:0db5f2e5081a; FULL-PDF read (ACM Computing Surveys).
+@article{liu2025moesurvey,
+  title   = {A Survey on Inference Optimization Techniques for Mixture of Experts Models},
+  author  = {Liu, Jiacheng and Tang, Peng and Wang, Wenfeng and Ren, Yuhang and Hou, Xiaofeng and Heng, Pheng-Ann and Guo, Minyi and Li, Chao},
+  journal = {ACM Computing Surveys},
+  year    = {2025},
+  eprint  = {2412.14219},
+  archivePrefix = {arXiv},
+  url     = {https://arxiv.org/abs/2412.14219}
 }

@@ -13,3 +13,7 @@ paper/build/
 *.out
 *.xdv
 .DS_Store
+
+# copyrighted reference PDFs + extracted text — never publish
+paper/refpdfs/*.pdf
+paper/refpdfs/txt/

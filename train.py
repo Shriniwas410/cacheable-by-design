@@ -76,6 +76,13 @@ def main():
     ap.add_argument("--data-dir", default="data")
     ap.add_argument("--run-name", required=True)
     ap.add_argument("--eval-only", action="store_true")
+    # scale-study knobs: override model size; 8-bit Adam to fit 8GB
+    ap.add_argument("--d-model", type=int, default=384)
+    ap.add_argument("--n-layers", type=int, default=8)
+    ap.add_argument("--n-experts", type=int, default=16)
+    ap.add_argument("--d-expert", type=int, default=768)
+    ap.add_argument("--adam8bit", action="store_true",
+                    help="use bitsandbytes 8-bit AdamW (needed for >137M on 8GB)")
     args = ap.parse_args()
 
     # arm -> loss weights (explicit, recorded in config)
@@ -90,7 +97,9 @@ def main():
     os.makedirs(run_dir, exist_ok=True)
     device = "cuda"
     torch.manual_seed(args.seed)
-    cfg = Config()
+    cfg = Config(d_model=args.d_model, n_layers=args.n_layers,
+                 n_heads=max(1, args.d_model // 64),
+                 n_experts=args.n_experts, d_expert=args.d_expert)
     model = StickyMoE(cfg).to(device)
 
     ckpt = os.path.join(run_dir, "ckpt.pt")
@@ -109,8 +118,13 @@ def main():
     assert len(tok_mm) == len(dom_mm), "token/domain length mismatch"
 
     steps = int(args.tokens / (args.bsz * args.seq))
-    opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1,
-                            betas=(0.9, 0.95))
+    if args.adam8bit:
+        import bitsandbytes as bnb
+        opt = bnb.optim.AdamW8bit(model.parameters(), lr=args.lr,
+                                  weight_decay=0.1, betas=(0.9, 0.95))
+    else:
+        opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.1,
+                                betas=(0.9, 0.95))
     sched = torch.optim.lr_scheduler.OneCycleLR(
         opt, max_lr=args.lr, total_steps=steps, pct_start=0.02)
     rng = np.random.default_rng(args.seed)
