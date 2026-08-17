@@ -80,6 +80,16 @@ recompiles clean, no undefined citations):
 - **liu2025moesurvey** (2412.14219, ACM CSUR) — inference-optimisation survey.
 Dropped after reading the PDF: 2511.05814 (a student analysis report, weak source).
 
+## Scale-study numbers — traced + proofread (2026-08-17)
+The paper's `tab:scale` and the 340M claims were re-derived from the run JSONs before
+the paper was pushed public. Every cell traces to `runs/{a-main-s1,b-main-s1,
+scale340-a,scale340-b05}/cacheaware.json` on a single consistent basis (seed 1, cap
+25%, τ from the sweep). `provenance.py::assert_comparable` confirmed arm A/B share
+tokens/params/seq before the comparison. The proofread caught and fixed one off-basis
+cell (137M stacked ΔPPL read +1.9% from §8.1's 2-seed-20k range; correct seed-1 value
+is +2.4%). Result: locality tax +2.02%(137M)→+2.53%(340M) — does not shrink;
+complementarity replicates (82% miss reduction at +3.4% PPL, ~9× cheaper rerouting).
+
 ## Reproduce
 ```
 cd paper

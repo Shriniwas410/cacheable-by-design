@@ -45,7 +45,45 @@ static hit@50% **0.991** (✓, near-perfect) · PPL **+3.1%** (✗) → **REFUTE
 - It is **NOT free** at this scale — a real perplexity tax that breaks the
   pre-registered quality gates for every configuration tested.
 - Pre-registration did its job: no configuration is reported as a pass.
-- **Open question (the interesting one):** the tax may shrink at larger scale —
-  more/finer experts give the router room to specialize for caching without
-  spending LM capacity. Small models can't afford dedicated cache-experts; big
-  ones might. That is the scale study this refutation motivates.
+- **Open question — NOW ANSWERED (see Scale study below):** the tax was hypothesized
+  to shrink at larger scale. A 340M rung shows it does **not** (it rose slightly);
+  undertraining at the matched budget keeps this suggestive. The complementarity
+  result, however, replicates at 340M.
+
+## COMPLEMENTARITY — training-time × training-free stacking (Phase 2)
+
+Applying training-free cache-aware rerouting (tolerance τ: substitute a cached expert
+scoring within (1−τ)·p_top of the top pick) ON TOP of a locality-trained model is
+nearly free, because training co-adapts experts into mutually-substitutable
+neighbourhoods.
+
+137M (b-main-s1, seed 1, cap 25% experts, LRU):
+- training-time locality alone (τ=0): +2.0% PPL for 59% fewer misses
+- **stacked (τ=0.5): 80% fewer misses at +2.4% PPL**
+- marginal cost τ0→0.5: +4.1% on baseline vs +0.4% on trained (2-seed 20k: 5–8×)
+
+Neither mechanism alone reaches a high-reduction/low-cost point; together they do.
+Domain-primed prefetching (prefetch a domain's experts at mixed-stream boundaries):
+**NO benefit** — an LRU cache rewarms in O(cap) tokens, so the boundary burst amortises.
+
+## SCALE STUDY — 340M rung (Phase 3)
+
+Does the locality PPL tax shrink with scale? Ran a 340M rung (d_model 512, 12 layers,
+16 experts top-2, d_expert 1024), arm A vs arm B λ=0.05, same 200M-token budget.
+
+| size | baseline PPL | locality tax (τ=0) | miss red. | stacked (τ=0.5) |
+|---|--:|--:|--:|--:|
+| 137M | 21.84 | +2.02% | 59.3% | 80% @ +2.4% |
+| 340M | 24.49 | +2.53% | 57.2% | 82% @ +3.4% |
+
+**Answer: the tax does NOT shrink — it rose (+2.02% → +2.53%).** Caveat: 340M at the
+matched 200M-token budget is more undertrained (baseline PPL 21.84 → 24.49), a
+confound; a compute-optimal and a ≥1B run are the definitive test (≥1B needs cloud —
+won't fit the 8GB RTX 3070).
+
+**But complementarity replicates at 340M:** τ0→0.5 costs +0.87% on the trained model
+vs +7.73% on baseline (~9× cheaper); stacked reaches 82% miss reduction at +3.4% PPL.
+The main positive result is scale-robust.
+
+Data: `runs/scale340-{a,b05}/{final_eval,cacheaware}.json`. Numbers proofread against
+paper Table `tab:scale`.
