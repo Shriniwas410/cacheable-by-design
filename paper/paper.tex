@@ -68,9 +68,20 @@ both cache-miss reduction \emph{and} language-modeling quality. The mechanism
 works---locality training cuts cache misses up to 60\% and domain training
 reaches a 99\% static-pin hit rate---but \emph{every configuration fails the
 pre-registered $\le\!1\%$ perplexity gate}: miss reduction and perplexity cost
-are tightly coupled, and no loss weight threads the joint bar at this scale. We
-report this negative result in full, argue it is not free only \emph{at small
-scale}, and lay out the scale study it motivates. All code, traces, and the
+are tightly coupled, and no loss weight threads the joint bar at this scale.
+Concurrent work (StickyMoE; \citealp{kayyam2026sticky}) proposes the same
+adjacent-token routing-consistency loss and reports it as nearly free---even
+\emph{improving} perplexity (up to $-4.1\%$)---on single-domain (WikiText-2),
+sub-25M-parameter models. On a harder multi-domain corpus at 137M we instead find
+the locality tax real and the $\le\!1\%$ gate unmet; our contribution is this
+\emph{pre-registered, stricter-criterion, multi-domain} evaluation, a
+domain-partitioning arm, and the edge-serving measurements above. We
+report this negative result in full. A 340M rung tests whether the tax shrinks with
+scale: it does not (it rises slightly), though undertraining at a matched budget
+leaves this suggestive. We further show that training-free cache-aware rerouting
+\emph{stacks} with trained locality---together reaching $\sim$80\% cache-miss
+reduction at $\le\!3.4\%$ perplexity at both sizes, far cheaper than either alone---
+while domain-primed prefetching does not help. All code, traces, and the
 pre-registration are released.
 \end{abstract}
 
@@ -108,9 +119,15 @@ and near-orthogonal per-domain expert sets, and simulate cache hit rates.
 \item \textbf{Path-Mapped Serving and its ceiling} (\S\ref{sec:pms}): a placement
 policy that improves decode $2$--$7\times$ at full accuracy but provably cannot
 reach interactive speed on this hardware.
-\item \textbf{A pre-registered negative result} (\S\ref{sec:sticky}--\ref{sec:results}):
-training MoE routers for cacheability works but fails a joint miss/quality bar
-at 137M scale; we report the full dose-response and argue for a scale study.
+\item \textbf{A pre-registered, stricter-criterion test of training-time locality}
+(\S\ref{sec:sticky}--\ref{sec:results}): the adjacent-token routing-consistency loss
+was introduced concurrently by StickyMoE \citep{kayyam2026sticky}, which reports it
+as nearly free (even \emph{improving} perplexity) on single-domain, sub-25M-parameter
+models. We independently and \emph{pre-registrably} evaluate it (plus a new
+domain-partitioning loss) under joint miss-and-quality criteria on a multi-domain
+corpus and find it fails a strict $\le\!1\%$ perplexity bar at 137M scale---in tension
+with StickyMoE's near-free result---and we chart the full dose-response and a scale
+study that probes the reconciliation.
 \end{enumerate}
 We deliberately hold accuracy fixed throughout: we never quantize below the
 model's shipped 4-bit weights nor distill, so ``same accuracy'' means bit-exact
@@ -360,13 +377,28 @@ reach interactive speed here.} This exhausts the ``raise bandwidth-to-bytes''
 attack on fixed hardware and motivates attacking \emph{bytes-per-token} at the
 source: the architecture.
 
-\section{sticky-moe: Training for Cacheability}
+\section{Training Routers for Cacheability}
 \label{sec:sticky}
 The $2.0\times$ locality that makes LRU work (\S\ref{sec:trace}) is
 \emph{accidental}---no production router is trained for it. We ask: is
 cacheability a trainable property obtainable \emph{at no accuracy cost}? We
 pre-registered the design (hypotheses, arms, metrics, and pass/fail thresholds
 frozen before any run) to make a null result meaningful.
+
+\paragraph{Relation to concurrent work.} Independently and concurrently,
+StickyMoE \citep{kayyam2026sticky} proposed the same adjacent-token
+routing-consistency loss (\S\ref{app:losses}, $\mathcal{L}_{\text{loc}}$) and
+reports it as a favorable, quality-\emph{improving} technique: on small ($8.8$M) and
+medium ($22$M) MoE LMs on the single-domain WikiText-2 corpus, its soft loss cuts the
+expert switch rate up to $59\%$ and reduces cache misses up to $3.92\times$ while
+perplexity \emph{improves} (up to $-4.1\%$ small, $-0.9\%$ medium). Our study differs
+in the corpus (a harder 3-domain prose/code/math mix), the criterion (a pre-registered
+strict joint miss/quality bar), and a domain-confinement arm they do not consider---and
+in conclusion: at 137M on multi-domain data we do \emph{not} clear the strict bar (see
+\S\ref{sec:results}). We read the two as complementary but in tension: StickyMoE shows
+the mechanism can be quality-preserving on single-domain, sub-25M models; we show it is
+not free on a harder multi-domain 137M setting, and flag the corpus and scale
+dependence that would reconcile them.
 
 \paragraph{Losses.} All arms use the Switch load-balance loss. We add two
 differentiable statements of what a cache wants, where $p_t\in\Delta^{E}$ is the
@@ -447,7 +479,6 @@ b-l02       & B & 0.02 & 32.0 & 0.407 & 0.564 & 0.794 \\
 b-l03       & B & 0.03 & 32.5 & 0.451 & 0.608 & 0.817 \\
 b-main (s1) & B & 0.05 & 32.6 & 0.634 & 0.788 & 0.930 \\
 b-main (s2) & B & 0.05 & 32.9 & 0.635 & 0.796 & 0.933 \\
-b-l20       & B & 0.20 & 70.1 & 0.861 & 0.855 & 0.977 \\
 c-main      & C & --- & 32.9 & 0.470 & 0.733 & \textbf{0.991} \\
 \bottomrule
 \end{tabular}
@@ -498,6 +529,83 @@ are not a dual-scale claim about one series.)}
 \label{fig:dose}
 \end{figure}
 
+\subsection{Training-free rerouting, and its complementarity with trained locality}
+\label{sec:complementarity}
+% NUMBERS: 2-seed 20k-token/domain held-out eval (runs/*/cacheaware_N20k.json), seeds s1/s2.
+The dose-response above trains the router for locality. A cache can also be
+helped \emph{at inference time only}, with no retraining: when a token's
+top-ranked expert is not resident but a cached expert scores within a relative
+tolerance $\tau$ of it, we route to the cached expert instead---the training-free
+strategy of \citet{cachecond2024}, trading a controlled slice of routing
+fidelity for cache hits. Sweeping $\tau$ traces a perplexity-versus-miss frontier
+from any fixed checkpoint. Numbers here use an independent held-out
+multi-domain stream with the same per-layer LRU cache (25\% of experts); we
+report relative effects, and absolute perplexities differ slightly from
+Table~\ref{tab:main}'s 500k-token evaluation.
+
+First, on the \emph{baseline} model (arm A, never trained for locality)
+training-free rerouting reaches $\sim$30\% miss reduction at $+$0.8\% perplexity
+on one seed ($+$2.0\% on the other---this low-$\tau$ regime is seed-sensitive),
+at zero training cost; but pushed harder it degrades fast on both seeds (50\%
+reduction costs $+$4.0--5.8\%; 74\% costs $+$25\%), because rerouting an
+untrained router forces genuinely worse experts.
+
+Second, and the main point: the two mechanisms are \emph{complementary}, and this
+holds across both seeds. Applying the same $\tau$ sweep on top of the
+locality-\emph{trained} model ($\lambda{=}0.05$) is nearly free. Training-time
+locality alone gives 58--61\% miss reduction at $+$1.4--2.2\% PPL; adding
+$\tau{=}0.5$ raises this to \textbf{80--82\% reduction at $+$1.9--3.1\%}, and
+$\tau{=}0.7$ to 86--88\% (Figure~\ref{fig:complementarity}; ranges are the two
+seeds). The identical $\tau{=}0{\to}0.5$ intervention that costs $+$4.0--5.8\% PPL
+on the baseline costs only $+$0.5--0.9\% on the trained model---a 5--8$\times$
+smaller marginal cost. Training for locality co-adapts experts into mutually
+substitutable neighbourhoods (expert redundancy and mergeability are well
+documented---similar experts can be merged with little loss \citep{li2024mcsmoe}---and
+routing specialisation strengthens over training \citep{mouzouni2026threephases}),
+so inference-time substitution within a
+neighbourhood barely perturbs the output. Neither mechanism alone threads a
+high-reduction, low-cost point; together they reach $\sim$80\% fewer misses at an
+operating point that no single setting in Table~\ref{tab:main} attains. This
+complementarity replicates at 340M (Table~\ref{tab:scale}): the $\tau0{\to}0.5$
+intervention costs $+0.9\%$ perplexity on the trained model versus $+7.7\%$ on the
+baseline, and stacking reaches 82\% miss reduction at $+3.4\%$---so it is not a
+single-scale artifact.
+
+We also tested a \emph{domain-primed} variant (cf.\ data-aware offloading,
+\citealp{zhang2025daop})---prefetching a domain's experts
+into the cache at each boundary of a mixed prose/code/math stream---and found no
+measurable benefit: an LRU cache re-warms within $O(\text{cap})$ tokens of a
+switch, so the boundary miss burst amortises to nothing over realistic
+($\ge$1k-token) domain runs (mixed-stream miss/token equals the single-domain
+value to within noise). The domain-switch cache penalty, plausible a priori, is
+negligible; multi-domain difficulty is a \emph{training} phenomenon (the tax
+above), not a serving-time caching one.
+
+\begin{figure}[t]\centering
+\begin{tikzpicture}
+\begin{axis}[width=0.80\textwidth,height=5.6cm,
+ xlabel={expert-cache miss reduction vs baseline (\%)},
+ ylabel={perplexity cost (\%)},
+ xmin=0,xmax=100,ymin=-1,ymax=26,grid=both,grid style={black!8},
+ legend style={font=\footnotesize,at={(0.02,0.98)},anchor=north west},
+ legend cell align=left]
+\addplot[wall,thick,mark=*] coordinates {(0,0)(15.3,0.2)(30.0,0.8)(50.6,4.02)(73.8,25.0)};
+\addplot[acc,thick,mark=triangle*] coordinates {(58.5,1.44)(69.7,1.49)(74.2,1.61)(79.8,1.92)(86.1,3.09)(94.2,11.46)};
+\addplot[black,only marks,mark=square*,mark size=2pt] coordinates {(14.9,0.96)(23.5,1.23)(58.5,1.44)};
+\draw[black!35,dashed] (axis cs:0,1) -- (axis cs:100,1);
+\node[black!45,font=\tiny] at (axis cs:14,2.0) {$\le$1\% gate};
+\legend{training-free (baseline model), stacked (trained $+$ reroute), training-time ($\tau{=}0$)}
+\end{axis}
+\end{tikzpicture}
+\caption{Complementarity of trained and inference-time locality. Training-free
+rerouting on the baseline (blue) is cheap only up to $\sim$30\% miss reduction,
+then diverges. On the locality-trained model the same rerouting (green) stays
+flat and low, reaching 80\% miss reduction at $+$2.4\% perplexity---far beyond
+training-time alone (squares, max 59\%) or training-free alone. The experts'
+co-adaptation makes inference-time substitution nearly free.}
+\label{fig:complementarity}
+\end{figure}
+
 \section{Discussion}
 The mechanism is real: training changes routing exactly as intended, with large
 ($\le$60\% fewer misses; 99\% static hit), monotonic, seed-stable effects. But
@@ -506,22 +614,51 @@ pre-registered bars everywhere. We take the joint-criterion refutation at face
 value; pre-registration is what stops a large-but-costly effect from being
 reported as a win by choosing a favourable metric post hoc.
 
-\paragraph{Why small scale may be the reason.}
-A 16-expert, 137M model has little spare capacity: forcing the router to reuse
-or confine experts removes representational freedom the model was using for
-language modelling, so quality drops. Sparsity scaling suggests the tax should
-shrink with $E$ and total parameters---more, finer experts give the router room
-to specialise for caching \emph{and} for the task
-\citep{dai2024deepseekmoe,deepseekai2024deepseekv3}. The sharp, testable hypothesis this negative
-result earns is therefore: \emph{the perplexity cost of a fixed cacheability
-gain decreases with model scale}. Confirming or refuting it needs a size ladder
-(e.g.\ 137M$\to$1B$\to$7B), which is the natural follow-up and is inexpensive in
-the cloud relative to a frontier run.
+\paragraph{Does the tax shrink with scale? A 340M rung says not yet.}
+A 16-expert, 137M model has little spare capacity: forcing the router to reuse or
+confine experts removes representational freedom the model was using for language
+modelling, so quality drops. Sparsity scaling suggests the tax should shrink with
+$E$ and total parameters \citep{dai2024deepseekmoe,deepseekai2024deepseekv3}, giving
+a sharp, pre-registered hypothesis: \emph{the perplexity cost of a fixed cacheability
+gain decreases with model scale}. We tested it directly with a 340M rung
+(Table~\ref{tab:scale}), matched to the 137M runs at the same 200M-token budget and
+$\lambda{=}0.05$. It does \emph{not} shrink: at a fixed $\sim$58\% cache-miss
+reduction the locality tax \emph{rises} from $+2.0\%$ (137M) to $+2.5\%$ (340M). Two
+caveats keep this suggestive rather than decisive: at a matched token budget the 340M
+model is more undertrained (its baseline perplexity is higher, \S\ref{sec:limits}),
+and the ladder has only two rungs. A compute-optimal and a $\ge\!1$B run are the
+definitive test. Concurrent work is consistent with a scale effect existing in
+principle---Oracle-MoE \citep{zhou2025oraclemoe} trains for locality across a
+200M--2B ladder without task-performance loss---but on standard, not multi-domain
+strict-bar, evaluation. Crucially, the \emph{complementarity} result
+(\S\ref{sec:complementarity}) \emph{does} replicate at 340M: training-free rerouting
+stays $\sim$9$\times$ cheaper on the locality-trained model and stacking reaches
+82\% miss reduction at $+3.4\%$ perplexity---so the cheapest-when-trained-and-rerouted
+finding is not a 137M artifact.
+
+\begin{table}[t]\centering
+\caption{Scale rung. Locality tax (arm A baseline vs arm B $\lambda{=}0.05$ at
+$\tau{=}0$) and the stacked training-free rerouting point ($\tau{=}0.5$ on arm B), at
+137M and 340M; same 200M-token budget, cap${=}25\%$ experts, LRU, seed~1. The tax
+does not shrink with scale; the stacking advantage persists.}
+\label{tab:scale}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{locality tax ($\tau{=}0$)} & \multicolumn{2}{c}{stacked ($\tau{=}0.5$)} \\
+size & $\Delta$PPL & miss red.\ & $\Delta$PPL & miss red.\ \\
+\midrule
+137M & $+2.0\%$ & $59\%$ & $+2.4\%$ & $80\%$ \\
+340M & $+2.5\%$ & $57\%$ & $+3.4\%$ & $82\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Limitations}
 \label{sec:limits}
-(i) \textbf{Scale}: a single 137M configuration; routers at frontier scale may
-behave differently, and this is exactly the open question. (ii) \textbf{Proxy}:
+(i) \textbf{Scale}: two rungs (137M, 340M), both below compute-optimal; the 340M
+locality tax did not shrink (Table~\ref{tab:scale}), but a $\ge\!1$B rung and a
+compute-optimal run remain the definitive test. (ii) \textbf{Proxy}:
 the routing profile (\S\ref{sec:trace}) is Qwen3-30B, a same-family proxy for
 the 235B; a same-artifact trace on the 235B GGUF is future work. (iii)
 \textbf{Undertraining}: 200M tokens is far below compute-optimal, so absolute
@@ -536,11 +673,29 @@ from measured IO and cache rates, not end-to-end deployed.
 \citep{fedus2022switch}, GShard \citep{lepikhin2021gshard}, and fine-grained
 DeepSeekMoE \citep{dai2024deepseekmoe} establish the total/active split and load
 balancing; routing analyses \citep{dai2024deepseekmoe} document the specialization we
-exploit. \textbf{Edge MoE and expert offloading.} PowerInfer/PowerInfer-2
+exploit. \textbf{Training-time routing locality (closest prior/concurrent work).}
+StickyMoE \citep{kayyam2026sticky} introduces the adjacent-token routing-consistency
+loss we study here and reports it favorably; Oracle-MoE \citep{zhou2025oraclemoe}
+likewise \emph{trains} for locality---routing in an attention-derived ``oracle
+space''---and reports gains across a 200M--2B size ladder without task-performance
+loss, while post-hoc router fine-tuning (ReMoE \citep{zhu2026remoe}, $+$26\% reuse;
+MELINOE \citep{raje2026melinoe}, up to $3\times$ fewer transfers) adapts a pretrained
+router for reuse rather than co-adapting experts and routing from step one.
+Cache-conditional \emph{routing}
+\citep{cachecond2024} is a training-free, cache-aware routing strategy that cuts mobile
+cache misses $>$50\% at 0.1--3\% PPL (surpassing the oracle cache bound), and
+expert-locality decode routing \citep{eldr2026} exploits locality at serving time. Our contribution relative
+to these is the pre-registered, strict-criterion evaluation, the domain-confinement
+arm, a 137M$\to$340M scale rung (the tax does not shrink), and the training-time
+$\times$ training-free stacking result. \textbf{Edge MoE and expert offloading.} PowerInfer/PowerInfer-2
 \citep{song2024powerinfer,xue2024powerinfer2}, EdgeMoE \citep{yi2023edgemoe}, MoE-Infinity
-\citep{xue2024moeinfinity}, HOBBIT \citep{tang2024hobbit}, AdapMoE \citep{zhong2024adapmoe}, and related
-systems predict, prefetch, and cache experts across the hierarchy---the lineage
-of PMS; MoE-Infinity's activation tracing is the direct ancestor of our tracer.
+\citep{xue2024moeinfinity}, HOBBIT \citep{tang2024hobbit}, AdapMoE \citep{zhong2024adapmoe},
+Fiddler \citep{kamahori2025fiddler}, cross-layer gate prediction (Fate;
+\citealp{fang2025fate}), and related systems predict, prefetch, cache, or
+CPU-GPU-orchestrate experts across the hierarchy---the lineage of PMS; MoE-Infinity's
+activation tracing is the direct ancestor of our tracer, and Fiddler's CPU-side expert
+execution is an alternative to the disk-streaming regime we measure; see
+\citet{liu2025moesurvey} for a system-stack survey of MoE inference optimisation.
 \textbf{Offloaded inference and the bandwidth bound.} FlexGen \citep{sheng2023flexgen}
 and ZeRO-Inference characterise memory-bound generation. \textbf{Complementary
 axes we hold fixed.} Quantization \citep{frantar2023gptq,lin2024awq,ma2024bitnet158} and KV-cache
@@ -561,7 +716,13 @@ scaling claim, and because the discipline of reporting it is the point.
 
 \paragraph{Reproducibility.} Pre-registration, training/analysis code, the
 \texttt{llama-moe-trace} tool, all router traces, and per-run configs, seeds,
-and data hashes are released with this paper.
+and data hashes are released at \url{https://github.com/Shriniwas410/sticky-moe}.
+
+\paragraph{Use of AI assistance.} The author used an AI coding assistant to help
+implement the experimental harness and to draft and edit the manuscript. All
+experimental design decisions, the pre-registration, the runs, and the
+interpretation are the author's, who takes full responsibility for the content
+and has verified every reported number against the released artifacts.
 
 \appendix
 \section{Per-Domain Results}
@@ -709,7 +870,7 @@ $\mathcal{L}_{\text{loc}}$ and $\mathcal{L}_{\text{dom}}$, the domain-mask
 layout, determinism, and grouped-vs-loop dispatch parity; all router traces
 (\texttt{.npz}); and per-run \texttt{config.json} with seed, loss weights, token
 budget, and data-shard SHA-256 hashes. Every number in this paper is regenerable
-from these.
+from these. Code and artifacts: \url{https://github.com/Shriniwas410/sticky-moe}.
 
 \small
 \bibliography{references}
