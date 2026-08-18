@@ -90,6 +90,28 @@ cell (137M stacked ΔPPL read +1.9% from §8.1's 2-seed-20k range; correct seed-
 is +2.4%). Result: locality tax +2.02%(137M)→+2.53%(340M) — does not shrink;
 complementarity replicates (82% miss reduction at +3.4% PPL, ~9× cheaper rerouting).
 
+## Second-pass multi-agent sweep (2026-08-18) — found 3 real errors + 2 missed refs
+The `verify_workflow.js` grounding+discovery sweep ran fully this time (60/60 agents). It
+caught **3 real errors** (now fixed), all of the "number attributed to the wrong thing" class:
+- **kayyam2026sticky (StickyMoE):** we had the −4.1% PPL improvement on the *small* model;
+  it is the *medium* (22M) model at λ=0.05 (Table 7). The small (8.8M) model barely changes
+  (best −0.5% at λ=0.01, +0.1% at λ=0.05; Table 6). Fixed in bib **and** paper.tex.
+- **shazeer2017moe:** "4096 experts ≈ 137B params" conflated two experiments; the 4096-expert
+  run is ~4B MoE-layer params (~1M/expert). 137B is the separate 131072-expert run.
+- **xue2024moeinfinity:** "1–16.7×" → correct "3.1–16.7×".
+
+**Discovery** surfaced 2 genuinely-missed references (added, grounded, cited):
+- **he2024expertflow** (2410.17954, DAC'26) — training-free predictive expert caching + token
+  scheduling; predates cachecond. (Grounding correction: it predicts/prefetches/schedules, it
+  does *not* do tolerance-based expert substitution — milder overlap than the agent implied.)
+- **liang2026localrouting** (2505.16056, ICLR'26) — measures "local routing consistency" across
+  20 MoE models; corroborates our premise's cost side.
+
+**Methodological caveat (honest):** the cheap grounding pass reads a ~3.8KB windowed excerpt,
+so many `UNSUPPORTED`/`PARTIAL` verdicts are **excerpt-slicing artifacts** ("only the abstract
+is in the excerpt"), not proof a claim is wrong — those entries were verified from the full PDF
+in the first pass. The sweep's value is the deterministic errors it *did* surface, above.
+
 ## Reproduce
 ```
 cd paper

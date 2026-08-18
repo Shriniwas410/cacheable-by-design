@@ -66,6 +66,13 @@ Neither mechanism alone reaches a high-reduction/low-cost point; together they d
 Domain-primed prefetching (prefetch a domain's experts at mixed-stream boundaries):
 **NO benefit** — an LRU cache rewarms in O(cap) tokens, so the boundary burst amortises.
 
+**Near-lossless load-elision (preliminary, third intervention):** eliding the 2nd expert's
+load whenever its renormalised gate < ε=0.02 (a resident, load-free test) drops ~12% of
+expert loads (prose/code/math 12.6/18.5/3.8%) at ≤0.05% PPL change on the locality model,
+vs ~0% on the baseline. Truly-lossless (100% bit-identical) requires ε→0 (≈0% skip), so it
+is *near*-lossless, not certified lossless. Locality training makes experts not just
+substitutable but often omittable. Code: cert_elision.py, probe_elision.py.
+
 ## SCALE STUDY — 340M rung (Phase 3)
 
 Does the locality PPL tax shrink with scale? Ran a 340M rung (d_model 512, 12 layers,

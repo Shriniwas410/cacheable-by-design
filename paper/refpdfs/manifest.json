@@ -1,6 +1,6 @@
 {
  "generated_by": "ingest_refpdfs.py",
- "count": 63,
+ "count": 65,
  "entries": [
   {
    "key": "du2022glam",
@@ -763,6 +763,30 @@
    "sha256": "0db5f2e5081a1da3044ed73733bb3616154bad032515df141994eca6f2671ba4",
    "bytes": 2071375,
    "pages": 35,
+   "status": "OK"
+  },
+  {
+   "key": "he2024expertflow",
+   "eprint": "2410.17954",
+   "title": "{ExpertFlow}: Efficient Mixture-of-Experts Inference via Predictive Expert Caching and Token Scheduling",
+   "author": "He, Xin and Zhang, Shunkang and Tang, Kaijie and Shi, Shaohuai and Wang, Yuxin and Zeng, Zihao and Tang, Zhenheng and Chu, Xiaowen and Yin, Haiyan and Tsang, Ivor W. and Ong, Yew Soon",
+   "pdf": "refpdfs/2410.17954.pdf",
+   "txt": "refpdfs/txt/2410.17954.txt",
+   "sha256": "3e5ce9f16e5e0327ea5828e34fce76c194f98fafd1d880aedd6287c450fbdeb3",
+   "bytes": 3079693,
+   "pages": 7,
+   "status": "OK"
+  },
+  {
+   "key": "liang2026localrouting",
+   "eprint": "2505.16056",
+   "title": "Not All Models Suit Expert Offloading: On Local Routing Consistency of Mixture-of-Expert Models",
+   "author": "Liang, Jingcong and Wang, Siyuan and Tian, Miren and Li, Yitong and Tang, Duyu and Wei, Zhongyu",
+   "pdf": "refpdfs/2505.16056.pdf",
+   "txt": "refpdfs/txt/2505.16056.txt",
+   "sha256": "ab0d92df7f4066b89ec5b4cd223e58de77c7aebf443bbe161e703d991c7dae95",
+   "bytes": 7256623,
+   "pages": 29,
    "status": "OK"
   }
  ]

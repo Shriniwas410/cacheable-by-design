@@ -391,7 +391,9 @@ routing-consistency loss (\S\ref{app:losses}, $\mathcal{L}_{\text{loc}}$) and
 reports it as a favorable, quality-\emph{improving} technique: on small ($8.8$M) and
 medium ($22$M) MoE LMs on the single-domain WikiText-2 corpus, its soft loss cuts the
 expert switch rate up to $59\%$ and reduces cache misses up to $3.92\times$ while
-perplexity \emph{improves} (up to $-4.1\%$ small, $-0.9\%$ medium). Our study differs
+perplexity \emph{improves on the medium ($22$M) model} (up to $-4.1\%$ at $\lambda{=}0.05$)
+and is essentially preserved on the small ($8.8$M) model ($+0.1\%$ at that $\lambda$; best
+$-0.5\%$). Our study differs
 in the corpus (a harder 3-domain prose/code/math mix), the criterion (a pre-registered
 strict joint miss/quality bar), and a domain-confinement arm they do not consider---and
 in conclusion: at 137M on multi-domain data we do \emph{not} clear the strict bar (see
@@ -569,7 +571,12 @@ operating point that no single setting in Table~\ref{tab:main} attains. This
 complementarity replicates at 340M (Table~\ref{tab:scale}): the $\tau0{\to}0.5$
 intervention costs $+0.9\%$ perplexity on the trained model versus $+7.7\%$ on the
 baseline, and stacking reaches 82\% miss reduction at $+3.4\%$---so it is not a
-single-scale artifact.
+single-scale artifact. As a preliminary third case, the same locality training makes
+the second expert's load frequently \emph{omittable}: eliding it whenever its
+renormalised gate falls below $\epsilon{=}0.02$ (a resident, load-free test) drops
+$\sim$12\% of expert loads (prose/code/math $12.6/18.5/3.8\%$) at a near-lossless
+${\le}0.05\%$ perplexity change on the trained model, versus essentially none on the
+baseline.
 
 We also tested a \emph{domain-primed} variant (cf.\ data-aware offloading,
 \citealp{zhang2025daop})---prefetching a domain's experts
@@ -684,14 +691,19 @@ router for reuse rather than co-adapting experts and routing from step one.
 Cache-conditional \emph{routing}
 \citep{cachecond2024} is a training-free, cache-aware routing strategy that cuts mobile
 cache misses $>$50\% at 0.1--3\% PPL (surpassing the oracle cache bound), and
-expert-locality decode routing \citep{eldr2026} exploits locality at serving time. Our contribution relative
+expert-locality decode routing \citep{eldr2026} exploits locality at serving time; and
+\citet{liang2026localrouting} measure this ``local routing consistency'' across 20 MoE
+models, finding it trades off against load balance---corroborating why a locality
+intervention carries a capacity cost. Our contribution relative
 to these is the pre-registered, strict-criterion evaluation, the domain-confinement
 arm, a 137M$\to$340M scale rung (the tax does not shrink), and the training-time
 $\times$ training-free stacking result. \textbf{Edge MoE and expert offloading.} PowerInfer/PowerInfer-2
 \citep{song2024powerinfer,xue2024powerinfer2}, EdgeMoE \citep{yi2023edgemoe}, MoE-Infinity
 \citep{xue2024moeinfinity}, HOBBIT \citep{tang2024hobbit}, AdapMoE \citep{zhong2024adapmoe},
 Fiddler \citep{kamahori2025fiddler}, cross-layer gate prediction (Fate;
-\citealp{fang2025fate}), and related systems predict, prefetch, cache, or
+\citealp{fang2025fate}), predictive caching with token scheduling (ExpertFlow,
+predating cache-conditional routing; \citealp{he2024expertflow}), and related
+systems predict, prefetch, cache, or
 CPU-GPU-orchestrate experts across the hierarchy---the lineage of PMS; MoE-Infinity's
 activation tracing is the direct ancestor of our tracer, and Fiddler's CPU-side expert
 execution is an alternative to the disk-streaming regime we measure; see

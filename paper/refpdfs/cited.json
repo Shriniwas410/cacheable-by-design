@@ -1,0 +1,332 @@
+[
+ {
+  "key": "du2022glam",
+  "eprint": "2112.06905",
+  "title": "{GLaM}: Efficient Scaling of Language Models with Mixture-of-Experts"
+ },
+ {
+  "key": "zoph2022stmoe",
+  "eprint": "2202.08906",
+  "title": "{ST-MoE}: Designing Stable and Transferable Sparse Expert Models"
+ },
+ {
+  "key": "zhou2022expertchoice",
+  "eprint": "2202.09368",
+  "title": "Mixture-of-Experts with Expert Choice Routing"
+ },
+ {
+  "key": "shazeer2017moe",
+  "eprint": "1701.06538",
+  "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer"
+ },
+ {
+  "key": "fedus2022switch",
+  "eprint": "2101.03961",
+  "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity"
+ },
+ {
+  "key": "lepikhin2021gshard",
+  "eprint": "2006.16668",
+  "title": "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding"
+ },
+ {
+  "key": "dai2024deepseekmoe",
+  "eprint": "2401.06066",
+  "title": "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models"
+ },
+ {
+  "key": "jiang2024mixtral",
+  "eprint": "2401.04088",
+  "title": "Mixtral of Experts"
+ },
+ {
+  "key": "song2024powerinfer",
+  "eprint": "2312.12456",
+  "title": "PowerInfer: Fast Large Language Model Serving with a Consumer-grade GPU"
+ },
+ {
+  "key": "xue2024powerinfer2",
+  "eprint": "2406.06282",
+  "title": "PowerInfer-2: Fast Large Language Model Inference on a Smartphone"
+ },
+ {
+  "key": "yi2023edgemoe",
+  "eprint": "2308.14352",
+  "title": "EdgeMoE: Empowering Sparse Large Language Models on Mobile Devices"
+ },
+ {
+  "key": "xue2024moeinfinity",
+  "eprint": "2401.14361",
+  "title": "MoE-Infinity: Efficient MoE Inference on Personal Machines with Sparsity-Aware Expert Cache"
+ },
+ {
+  "key": "kamahori2025fiddler",
+  "eprint": "2402.07033",
+  "title": "Fiddler: CPU-GPU Orchestration for Fast Inference of Mixture-of-Experts Models"
+ },
+ {
+  "key": "hwang2023pregated",
+  "eprint": "2308.12066",
+  "title": "Pre-gated MoE: An Algorithm-System Co-Design for Fast and Scalable Mixture-of-Expert Inference"
+ },
+ {
+  "key": "du2024sidamoe",
+  "eprint": "2310.18859",
+  "title": "SiDA-MoE: Sparsity-Inspired Data-Aware Serving for Efficient and Scalable Large Mixture-of-Experts Models"
+ },
+ {
+  "key": "eliseev2023mixtraloffload",
+  "eprint": "2312.17238",
+  "title": "Fast Inference of Mixture-of-Experts Language Models with Offloading"
+ },
+ {
+  "key": "deepseekai2024deepseekv3",
+  "eprint": "2412.19437",
+  "title": "DeepSeek-V3 Technical Report"
+ },
+ {
+  "key": "yang2025qwen3",
+  "eprint": "2505.09388",
+  "title": "Qwen3 Technical Report"
+ },
+ {
+  "key": "muennighoff2024olmoe",
+  "eprint": "2409.02060",
+  "title": "OLMoE: Open Mixture-of-Experts Language Models"
+ },
+ {
+  "key": "deepseekai2024deepseekv2",
+  "eprint": "2405.04434",
+  "title": "DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model"
+ },
+ {
+  "key": "wei2024skyworkmoe",
+  "eprint": "2406.06563",
+  "title": "Skywork-MoE: A Deep Dive into Training Techniques for Mixture-of-Experts Language Models"
+ },
+ {
+  "key": "cao2024moelightning",
+  "eprint": "2411.11217",
+  "title": "MoE-Lightning: High-Throughput MoE Inference on Memory-constrained GPUs"
+ },
+ {
+  "key": "zhong2024adapmoe",
+  "eprint": "2408.10284",
+  "title": "AdapMoE: Adaptive Sensitivity-based Expert Gating and Management for Efficient MoE Inference"
+ },
+ {
+  "key": "tang2024hobbit",
+  "eprint": "2411.01433",
+  "title": "HOBBIT: A Mixed Precision Expert Offloading System for Fast MoE Inference"
+ },
+ {
+  "key": "song2024promoe",
+  "eprint": "2410.22134",
+  "title": "ProMoE: Fast MoE-based LLM Serving using Proactive Caching"
+ },
+ {
+  "key": "xu2025moegen",
+  "eprint": "2503.09716",
+  "title": "MoE-Gen: High-Throughput MoE Inference on a Single GPU with Module-Based Batching"
+ },
+ {
+  "key": "kong2024swapmoe",
+  "eprint": "2308.15030",
+  "title": "SwapMoE: Serving Off-the-shelf MoE-based Large Language Models with Tunable Memory Budget"
+ },
+ {
+  "key": "sheng2023flexgen",
+  "eprint": "2303.06865",
+  "title": "FlexGen: High-Throughput Generative Inference of Large Language Models with a Single GPU"
+ },
+ {
+  "key": "aminabadi2022deepspeed",
+  "eprint": "2207.00032",
+  "title": "DeepSpeed Inference: Enabling Efficient Inference of Transformer Models at Unprecedented Scale"
+ },
+ {
+  "key": "pope2022scaling",
+  "eprint": "2211.05102",
+  "title": "Efficiently Scaling Transformer Inference"
+ },
+ {
+  "key": "frantar2023gptq",
+  "eprint": "2210.17323",
+  "title": "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers"
+ },
+ {
+  "key": "lin2024awq",
+  "eprint": "2306.00978",
+  "title": "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration"
+ },
+ {
+  "key": "xiao2023smoothquant",
+  "eprint": "2211.10438",
+  "title": "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models"
+ },
+ {
+  "key": "liu2025spinquant",
+  "eprint": "2405.16406",
+  "title": "SpinQuant: LLM Quantization with Learned Rotations"
+ },
+ {
+  "key": "wang2023bitnet",
+  "eprint": "2310.11453",
+  "title": "BitNet: Scaling 1-bit Transformers for Large Language Models"
+ },
+ {
+  "key": "ma2024bitnet158",
+  "eprint": "2402.17764",
+  "title": "The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits"
+ },
+ {
+  "key": "liu2025paretoq",
+  "eprint": "2502.02631",
+  "title": "ParetoQ: Improving Scaling Laws in Extremely Low-bit LLM Quantization"
+ },
+ {
+  "key": "dettmers2023qlora",
+  "eprint": "2305.14314",
+  "title": "QLoRA: Efficient Finetuning of Quantized LLMs"
+ },
+ {
+  "key": "dettmers2022llmint8",
+  "eprint": "2208.07339",
+  "title": "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale"
+ },
+ {
+  "key": "xiao2024streamingllm",
+  "eprint": "2309.17453",
+  "title": "Efficient Streaming Language Models with Attention Sinks"
+ },
+ {
+  "key": "zhang2023h2o",
+  "eprint": "2306.14048",
+  "title": "H2O: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models"
+ },
+ {
+  "key": "xiao2024duoattention",
+  "eprint": "2410.10819",
+  "title": "DuoAttention: Efficient Long-Context LLM Inference with Retrieval and Streaming Heads"
+ },
+ {
+  "key": "leviathan2023speculative",
+  "eprint": "2211.17192",
+  "title": "Fast Inference from Transformers via Speculative Decoding"
+ },
+ {
+  "key": "cai2024medusa",
+  "eprint": "2401.10774",
+  "title": "Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads"
+ },
+ {
+  "key": "li2024eagle",
+  "eprint": "2401.15077",
+  "title": "EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty"
+ },
+ {
+  "key": "li2024eagle2",
+  "eprint": "2406.16858",
+  "title": "EAGLE-2: Faster Inference of Language Models with Dynamic Draft Trees"
+ },
+ {
+  "key": "li2025eagle3",
+  "eprint": "2503.01840",
+  "title": "EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test"
+ },
+ {
+  "key": "miao2024specinfer",
+  "eprint": "2305.09781",
+  "title": "SpecInfer: Accelerating Generative Large Language Model Serving with Tree-based Speculative Inference and Verification"
+ },
+ {
+  "key": "borzunov2023petals",
+  "eprint": "2209.01188",
+  "title": "Petals: Collaborative Inference and Fine-tuning of Large Models"
+ },
+ {
+  "key": "hu2022pipeedge",
+  "eprint": "2110.14895",
+  "title": "Pipeline Parallelism for Inference on Heterogeneous Edge Computing"
+ },
+ {
+  "key": "zhou2024survey",
+  "eprint": "2404.14294",
+  "title": "A Survey on Efficient Inference for Large Language Models"
+ },
+ {
+  "key": "fedus2022review",
+  "eprint": "2209.01667",
+  "title": "A Review of Sparse Expert Models in Deep Learning"
+ },
+ {
+  "key": "lieber2024jamba",
+  "eprint": "2403.19887",
+  "title": "Jamba: A Hybrid Transformer-Mamba Language Model"
+ },
+ {
+  "key": "kayyam2026sticky",
+  "eprint": "2607.08780",
+  "title": "Sticky Routing: Training {MoE} Models for Memory-Efficient Inference"
+ },
+ {
+  "key": "eldr2026",
+  "eprint": "2607.00466",
+  "title": "{ELDR}: Expert-Locality-Aware Decode Routing for {PD}-Disaggregated {MoE} Serving"
+ },
+ {
+  "key": "cachecond2024",
+  "eprint": "2412.00099",
+  "title": "Mixture of Cache-Conditional Experts for Efficient Mobile Device Inference"
+ },
+ {
+  "key": "zhou2025oraclemoe",
+  "eprint": "",
+  "title": "{Oracle-MoE}: Locality-preserving Routing in the Oracle Space for Memory-constrained Large Language Model Inference"
+ },
+ {
+  "key": "zhu2026remoe",
+  "eprint": "2605.27081",
+  "title": "{ReMoE}: Boosting Expert Reuse through Router Fine-Tuning in Memory-Constrained MoE LLM Inference"
+ },
+ {
+  "key": "li2024mcsmoe",
+  "eprint": "2310.01334",
+  "title": "Merge, Then Compress: Demystify Efficient {SMoE} with Hints from Its Routing Policy"
+ },
+ {
+  "key": "fang2025fate",
+  "eprint": "2502.12224",
+  "title": "{Fate}: Fast Edge Inference of Mixture-of-Experts Models via Cross-Layer Gate"
+ },
+ {
+  "key": "zhang2025daop",
+  "eprint": "2501.10375",
+  "title": "{DAOP}: Data-Aware Offloading and Predictive Pre-Calculation for Efficient MoE Inference"
+ },
+ {
+  "key": "mouzouni2026threephases",
+  "eprint": "2604.04230",
+  "title": "Three Phases of Expert Routing: How Load Balance Evolves During Mixture-of-Experts Training"
+ },
+ {
+  "key": "raje2026melinoe",
+  "eprint": "2602.11192",
+  "title": "{MELINOE}: Fine-Tuning Enables Memory-Efficient Inference for Mixture-of-Experts Models"
+ },
+ {
+  "key": "liu2025moesurvey",
+  "eprint": "2412.14219",
+  "title": "A Survey on Inference Optimization Techniques for Mixture of Experts Models"
+ },
+ {
+  "key": "he2024expertflow",
+  "eprint": "2410.17954",
+  "title": "{ExpertFlow}: Efficient Mixture-of-Experts Inference via Predictive Expert Caching and Token Scheduling"
+ },
+ {
+  "key": "liang2026localrouting",
+  "eprint": "2505.16056",
+  "title": "Not All Models Suit Expert Offloading: On Local Routing Consistency of Mixture-of-Expert Models"
+ }
+]

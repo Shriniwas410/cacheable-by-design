@@ -64,9 +64,10 @@
   primaryClass  = {cs.LG}
 }
 
-% verified_finding: Results sec. -- the largest model (4096 experts, hierarchical MoE,
-%   ~137B params in the MoE layer) achieved 24% lower test perplexity than the
-%   computationally-matched LSTM baseline on the 1B Word Benchmark.
+% verified_finding: Results sec. -- the 4096-expert hierarchical MoE (~1M params/expert,
+%   ~4B MoE-layer params) achieved 24% lower test perplexity than the computationally-
+%   matched LSTM baseline on the 1B Word Benchmark (p6). A SEPARATE 100B-word experiment
+%   scales to 131072 experts / up to ~137B MoE-layer params (p7-8) -- do not conflate.
 % source: local pdf refpdfs/1701.06538.pdf sha256:2567713d198a; orig: chrome, html-read (ar5iv.labs.arxiv.org/html/1701.06538)
 @article{shazeer2017moe,
   title   = {Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer},
@@ -192,7 +193,7 @@
 }
 
 % verified_finding: Results -- expert-activation traces (EAM) guide cache replacement and
-%   prefetching, giving 1--16.7x latency reduction vs offloading baselines on a commodity GPU
+%   prefetching, giving 3.1--16.7x latency reduction vs offloading baselines on a commodity GPU
 %   (traces are collected at the EXPERT level, unlike generic memory tracers).
 % source: local pdf refpdfs/2401.14361.pdf sha256:2172d3905069; orig: chrome/curl, html-read (arxiv.org/html/2401.14361)
 @article{xue2024moeinfinity,
@@ -861,8 +862,10 @@
 % verified_finding: "StickyMoE" -- a differentiable routing-consistency (soft) loss
 %   penalising abrupt expert switches between adjacent tokens (single lambda, no arch
 %   change). On SMALL (8.8M) and MEDIUM (22M) MoE LMs on WikiText-2 (single domain):
-%   expert switch rate reduced up to 59%; Soft lambda=0.05 gives BEST PPL -4.1% (small)
-%   and -0.9% (medium) i.e. perplexity IMPROVES, not degrades; cache misses reduced up
+%   expert switch rate reduced up to 59%; Soft lambda=0.05 gives BEST PPL -4.1% on the
+%   MEDIUM (22M) model (Table 7); the SMALL (8.8M) model barely changes (best -0.5% at
+%   lambda=0.01, +0.1% at lambda=0.05; Table 6). Perplexity IMPROVES on medium and is
+%   ~preserved on small, not degraded; cache misses reduced up
 %   to 3.92x; Soft-Hard reaches SR 0.274 at +0.4% PPL. "Pareto-dominating post-hoc
 %   fine-tuning." arXiv stamp 12 Jun 2026. DIRECT CONCURRENT WORK; note their positive
 %   (near-free) result is on single-domain tiny models -- see our multi-domain 137M tension.
@@ -1039,4 +1042,39 @@
   eprint  = {2412.14219},
   archivePrefix = {arXiv},
   url     = {https://arxiv.org/abs/2412.14219}
+}
+
+% verified_finding: TRAINING-FREE predictive expert caching + token scheduling for offloaded
+%   MoE: a routing-path predictor (up to 95% accuracy) prefetches experts, a token scheduler
+%   reorders tokens to reuse resident experts, and a cache engine reaches 91.96% hit rate (up to
+%   61.15% over LRU); cuts peak memory up to 93.72% and improves throughput up to 10x over
+%   offloading baselines. arXiv Oct 2024 (PREDATES cache-conditional experts 2412.00099); DAC 2026.
+%   NOTE: predicts/prefetches/schedules tokens -- NOT tolerance-based expert substitution like our tau.
+% source: local pdf refpdfs/2410.17954.pdf sha256:3e5ce9f16e5e; FULL-PDF read.
+@inproceedings{he2024expertflow,
+  title     = {{ExpertFlow}: Efficient Mixture-of-Experts Inference via Predictive Expert Caching and Token Scheduling},
+  author    = {He, Xin and Zhang, Shunkang and Tang, Kaijie and Shi, Shaohuai and Wang, Yuxin and Zeng, Zihao and Tang, Zhenheng and Chu, Xiaowen and Yin, Haiyan and Tsang, Ivor W. and Ong, Yew Soon},
+  booktitle = {Proceedings of the 63rd ACM/IEEE Design Automation Conference (DAC)},
+  year      = {2026},
+  eprint    = {2410.17954},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2410.17954}
+}
+
+% verified_finding: defines LOCAL ROUTING CONSISTENCY (temporal expert-activation locality) and
+%   two metrics -- SRP (segment routing best performance, router-agnostic) and SCH (segment cache
+%   best hit rate) -- measured on 20 MoE LLMs (>=3B). Findings: strong trade-off between local
+%   routing consistency and local load balance (good GLOBAL balance can coexist); SHARED EXPERTS
+%   harm consistency; domain-specialized experts help consistency more than vocabulary-specialized;
+%   cache size ~2x active experts is a good operating point. ICLR 2026. Corroborates the cost side
+%   of our locality claim (consistency trades against balance, a proxy for the capacity/quality cost).
+% source: local pdf refpdfs/2505.16056.pdf sha256:ab0d92df7f40; FULL-PDF read.
+@inproceedings{liang2026localrouting,
+  title     = {Not All Models Suit Expert Offloading: On Local Routing Consistency of Mixture-of-Expert Models},
+  author    = {Liang, Jingcong and Wang, Siyuan and Tian, Miren and Li, Yitong and Tang, Duyu and Wei, Zhongyu},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2026},
+  eprint    = {2505.16056},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2505.16056}
 }
