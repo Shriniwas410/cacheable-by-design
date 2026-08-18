@@ -30,12 +30,16 @@ scale. Whether the tax shrinks with scale is the open question.
 | `analyze.py` | Self-contained metrics: perplexity, reuse, LRU/LFU/static/Belady cache sim |
 | `summarize.py` | Builds `RESULTS.md` and the pre-registered verdict |
 | `data.py` | 3-domain corpus builder (prose/code/math), SHA-256 manifested |
-| `run_experiment.sh`, `finish_experiment.sh`, `run_lambda_refine.sh` | Orchestrators for the full arm sequence |
+| `cacheeval.py`, `cacheeval_mixed.py` | Training-free cache-aware τ-rerouting eval (CPU); mixed-domain stream + domain-primed variant |
+| `frontier.py`, `frontier2.py` | Complementarity frontier plots (ΔPPL vs cache-miss reduction), provenance-guarded |
+| `provenance.py` | Run-provenance guard: `assert_comparable()` refuses to overlay runs with mismatched tokens/params/seed |
+| `probe_elision.py`, `cert_elision.py` | Lossless expert-load-elision feasibility probe + resident-gate realizable-rate experiment |
+| `run_experiment.sh`, `finish_experiment.sh`, `run_lambda_refine.sh`, `run_scale340.sh`, `run_scale_eval.sh` | Orchestrators for the arm sequence and the 137M→340M scale study |
 | `tests/` | 7 unit tests (loss math, gradients, determinism, dispatch parity) |
 | `runs/` | Per-run `config.json`, `metrics.json`, `final_eval.json`, logs, and router traces (`.npz`). **Checkpoints and the corpus are excluded** — see below |
 | `routing-lab/` | `moe-routing-lab`: measures routing on real GGUF models; `06_convert_gguf_trace.py` bridges the tracer output into the analysis pipeline |
 | `llama-moe-trace/` | `moe-trace.cpp` — router-telemetry addition to llama.cpp's eval-callback (weights untouched) |
-| `paper/` | LaTeX source, verified bibliography, publication plan |
+| `paper/` | LaTeX source, verified bibliography, and reference-verification tooling (`verify_refs.py`, `ingest_refpdfs.py`, `build_ctx.py`, `source_relink.py`, `verify_workflow.js`, `VERIFICATION.md`) |
 
 ## Reproduce
 
@@ -48,6 +52,17 @@ python train.py --arm C --tokens 200e6 --run-name c-main --seed 1
 python analyze.py runs/b-main --json runs/b-main/metrics.json
 python summarize.py --verdict
 python -m pytest tests/ -q
+```
+
+Complementarity (training-time × training-free stacking) and the 137M→340M scale rung:
+
+```bash
+# training-free cache-aware τ-sweep on a trained checkpoint, then the frontier figure
+python cacheeval.py --ckpt runs/b-main-s1/ckpt.pt --tag stack --out runs/b-main-s1/cacheaware.json
+python frontier2.py                    # complementarity figure (guarded by provenance.py)
+# scale study (adam8bit, fits 8 GB): train both 340M arms, then the tax comparison
+bash run_scale340.sh                   # arm A + arm B (λ=0.05) at 200M tokens
+bash run_scale_eval.sh                 # τ-sweep both 340M arms + print 137M-vs-340M locality-tax table
 ```
 
 The `llama-moe-trace` tool is a small addition to
@@ -67,6 +82,11 @@ The main results (paper Table 5 / `RESULTS.md`) come from `runs/a-main-s{1,2}`,
 `runs/b-main-s{1,2}`, `runs/b-l0{2,3}-main`, and `runs/c-main-s1`. The λ dose-response (paper
 Fig. 6) is those B-arm runs at λ ∈ {0.02, 0.03, 0.05, 0.20}. The frontier-model routing
 profile (paper §4, Qwen3-30B) comes from `routing-lab/` + `llama-moe-trace`.
+
+The complementarity result (paper §8.1) and the scale table (`tab:scale`) come from the
+`cacheaware.json` under `runs/a-main-s1`, `runs/b-main-s1` (137M) and `runs/scale340-a`,
+`runs/scale340-b05` (340M). The near-lossless elision numbers come from `cert_elision.py`
+and `probe_elision.py` on the same checkpoints.
 
 ## Citation
 
