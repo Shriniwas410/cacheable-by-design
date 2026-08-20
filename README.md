@@ -90,8 +90,22 @@ and `probe_elision.py` on the same checkpoints.
 
 ## Citation
 
-If you use this, please cite the paper (see `paper/`). Author: Shriniwas Ramesh Suram
-([ORCID 0009-0009-0452-9407](https://orcid.org/0009-0009-0452-9407)).
+Paper: [arXiv:2608.18261](https://arxiv.org/abs/2608.18261). Author: Shriniwas Ramesh
+Suram ([ORCID 0009-0009-0452-9407](https://orcid.org/0009-0009-0452-9407)).
+
+```bibtex
+@misc{suram2026cacheable,
+  title        = {Cacheable by Design? Training Mixture-of-Experts Routers for
+                  Locality Against the Edge Memory-Bandwidth Wall: A Pre-Registered
+                  Negative Result, with a Systems Measurement Study},
+  author       = {Suram, Shriniwas Ramesh},
+  year         = {2026},
+  eprint       = {2608.18261},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.AI},
+  url          = {https://arxiv.org/abs/2608.18261}
+}
+```
 
 ## License
 

@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Cacheable by Design? Training Mixture-of-Experts Routers for Locality Against the Edge Memory-Bandwidth Wall: A Pre-Registered Negative Result, with a Systems Measurement Study"
+authors:
+  - family-names: "Suram"
+    given-names: "Shriniwas Ramesh"
+    orcid: "https://orcid.org/0009-0009-0452-9407"
+version: 1.0.0
+date-released: 2026-08-18
+url: "https://github.com/Shriniwas410/cacheable-by-design"
+repository-code: "https://github.com/Shriniwas410/cacheable-by-design"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Cacheable by Design? Training Mixture-of-Experts Routers for Locality Against the Edge Memory-Bandwidth Wall: A Pre-Registered Negative Result, with a Systems Measurement Study"
+  authors:
+    - family-names: "Suram"
+      given-names: "Shriniwas Ramesh"
+      orcid: "https://orcid.org/0009-0009-0452-9407"
+  year: 2026
+  journal: "arXiv preprint arXiv:2608.18261"
+  eprint: "2608.18261"
+  archive-prefix: "arXiv"
+  primary-class: "cs.AI"
+  url: "https://arxiv.org/abs/2608.18261"
